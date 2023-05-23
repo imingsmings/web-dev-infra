@@ -1,0 +1,1 @@
+export { getOriginalData, updateData } from './request'
