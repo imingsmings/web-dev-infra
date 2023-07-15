@@ -46,6 +46,8 @@ function selectedArea(params) {
        })
 }
 
+const image = new Image(10, 30)
+image.src = 'public/1.png'
 function drawMap(map, data) {
     //防止重复注册
     if (!echarts.getMap(map)) echarts.registerMap(map, data);
@@ -87,9 +89,6 @@ function drawMap(map, data) {
         backgroundColor: '#666',
         geo: {
             map: map,
-            zlevel: 1,
-            z: 1,
-            // 缩放选项
             roam: true,
             itemStyle: {
                 normal: {
@@ -99,7 +98,6 @@ function drawMap(map, data) {
                 },
                 emphasis: {
                     borderWidth: 0,
-                    // areaColor: '#144393',
                     areaColor: '#ffff00',
                     shadowColor: '#8dc6ea',
                     shadowBlur: 30
@@ -109,18 +107,127 @@ function drawMap(map, data) {
                 normal: {
                     color: '#fff',
                     show: true,
-                    // fontSize: 20,
-                    // formatter: value => {
-                    //     return value.name.substring(0, 2)
-                    // }
                 },
                 emphasis: {
-                    color: 'red'
+                    // color: '#fff'
                 }
             },
             regions: mapDataArr
-        }
-    };
+        },
+        tooltip: {
+            trigger: 'item'
+        },
+        series: [
+          {
+              zlevel: 1,
+              name: '基站',
+              type: 'scatter',
+              coordinateSystem: 'geo',
+              encode: {
+                  value: 2
+              },
+              showEffectOn: 'emphasis',
+              rippleEffect: {
+                  brushType: 'stroke'
+              },
+              hoverAnimation: true,
+              data: [
+                  {name: '广州123', value: [113.280637,23.125178] },
+                  {name: '广州456', value: [113.365116,22.772595] },
+                  {name: '广州789', value: [113.227015,23.585731] },
+              ],
+              symbolSize: 10,
+              symbol: 'circle',
+              z: 10,
+              label: {
+                normal: {
+                    show: true,
+                    position: 'right',
+                    color: 'orange',
+                    formatter: '{b}'
+                }
+              },  
+              itemStyle: {
+                normal: {
+                    color: 'red',
+                    shadowBlur: 10,
+                    shadowColor: '#333',
+                    shadowBlur: 20,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)',
+                    shadowOffsetY: 8
+                }
+              },
+              tooltip: {
+                show: true,
+                formatter: function(param) {
+                    return `${param.seriesName}-${param.name}-${param.value.toString()}`
+                }
+              }
+          },
+          {
+            zlevel: 1,
+            name: '基站',
+            type: 'effectScatter',
+            coordinateSystem: 'geo',
+            encode: {
+                value: 2
+            },
+            showEffectOn: 'emphasis',
+            rippleEffect: {
+                brushType: 'stroke'
+            },
+            hoverAnimation: true,
+            data: [
+                {name: '广州123', value: [113.280637,23.125178] },
+                {name: '广州456', value: [113.365116,22.772595] },
+                {name: '广州789', value: [113.227015,23.585731] },
+            ],
+            symbol: 'rect',
+            symbolSize: [10, 30],
+            symbolOffset: [0, -30],
+            label: {
+              normal: {
+                show: true,
+                position: 'top',
+                textStyle: {
+                  color: 'green',
+                  fontSize: 12,
+                },
+                formatter: function (param) {
+                    return `${param.seriesName}-${param.data.name}`
+                }
+              }
+            },  
+            tooltip: {
+                show: false
+            },
+            itemStyle: {
+              normal: {
+                // 手动绘制
+                // color: {
+                //     type: 'color',
+                //     x: 0,
+                //     y: 0,
+                //     x2: 0,
+                //     y2: 1,
+                //     colorStops: [
+                //       { offset: 0, color: 'orange' },
+                //       { offset: 0.5, color: 'green' },
+                //       { offset: 1, color: 'blue' }
+                //     ]
+                //   },
+                // shadowBlur: 20, // 设置阴影的模糊程度
+                // shadowColor: 'rgba(0, 0, 0, 0.8)', // 设置阴影的颜色
 
+                color: {
+                    type: 'pattern',
+                    image: image,  // 图片的 URL
+                    repeat: 'no-repeat'  // 图片不重复平铺
+                },
+              }
+            },
+          }
+        ]
+    }
     chart.setOption(option);
 }
