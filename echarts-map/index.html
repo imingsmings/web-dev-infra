@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GuangDong Province</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/echarts-4.2.1.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.2.1/echarts.min.js"></script> -->
+</head>
+<body>
+   <div id="box"></div>
+   <div class="map-toolbar">
+    <div class="toolbar-item">
+        <span>区域:</span>
+        <select id="areaSelect"></select>
+    </div>
+    <div class="toolbar-item">
+        <span>打点数:</span>
+        <select id="pointCount"></select>
+    </div>
+    <div class="toolbar-item">
+        <input type="text" id="searchValue"/>
+        <button id="searchBtn">Search</button>
+    </div>
+    <div class="toolbar-item">
+        <button id="clear">Clear Points</button>
+    </div>
+   <div class="toolbar-item">
+        <button id="zoomIn" data-key="in">Zoom In</button>
+        <button id="zoomOut" data-key="out">Zoom Out</button>
+        <button id="resetBtn">Reset</button>
+   </div>
+   </div>
+   <script src="./js/index.js"></script>
+</body>
+</html>

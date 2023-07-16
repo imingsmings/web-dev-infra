@@ -11,3 +11,14 @@ html, body {
     height: 100%;
     margin: 0 auto;
 }
+.map-toolbar {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.map-toolbar .toolbar-item span{
+    display: inline-block;
+    width: 60px;
+    text-align: right;
+    color: #fff;
+}
