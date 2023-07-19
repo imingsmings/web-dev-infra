@@ -15,10 +15,10 @@ html, body {
     position: absolute;
     left: 0;
     top: 0;
+    color: #fff;
 }
 .map-toolbar .toolbar-item span{
     display: inline-block;
     width: 60px;
     text-align: right;
-    color: #fff;
 }

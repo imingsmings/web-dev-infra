@@ -3,10 +3,13 @@ const state = {
     chart: null,
     noDrillCity: ['中山市', '东莞市'],
     isDrilled: false,
-    neItems: []
+    neItems: [],
+    isDistrictLevel: false,
+    isAreaLevel: true
 }
 
 const MAP_CONFIG = {
+    MAP_NAME: '广东省',
     DEFAULT_CENTER: [113.280637,23.125178],
     DEFAULT_ZOOM: 1,
     MAP_BOUNDS: {
@@ -18,7 +21,12 @@ const MAP_CONFIG = {
     DEFAULT_POINT_COUNT: [10, 20, 50, 100, 200, 300, 400, 500, 1000],
     ZOOM_IN: 'in',
     ZOOM_OUT: 'out',
-    ZOOM_STEP: 0.3
+    ZOOM_STEP: 0.5,
+    ZOOM_LIMIT: {
+        MIN: 1,
+        MAX: 12
+    },
+    DISTRICT_LEVEL_ZOOM: 3
 }
 
 const oAreaSelect = document.querySelector('#areaSelect')
@@ -29,6 +37,7 @@ const oClearBtn = document.querySelector('#clear')
 const oZoomInBtn = document.querySelector('#zoomIn')
 const oZoomOutBtn = document.querySelector('#zoomOut')
 const oResetBtn = document.querySelector('#resetBtn')
+const oLabelInfo = document.querySelector('#labelInfo')
 const image = getLinearIcon()
 
 const init = async () => {
@@ -37,7 +46,8 @@ const init = async () => {
 }
 
 function bindEvent() {
-    state.chart.on('click', handleMapDrill)
+    state.chart.on('click', handleMapClick)
+    state.chart.on('geoRoam', handleRoamChange)
     oSearchBtn.addEventListener('click', handleSearch, false)
     oAreaSelect.addEventListener('change', handleAreaSelect, false)
     oPointCount.addEventListener('change', handlePointCount, false)
@@ -54,14 +64,14 @@ async function initMap() {
     const chart = echarts.init(document.getElementById('box'));
     state.chart = chart
 
-    echarts.registerMap('广东省', state.mapData['广东省']);
-    drawMap('广东省', state.mapData['广东省'])
+    drawMap(MAP_CONFIG.MAP_NAME, state.mapData[MAP_CONFIG.MAP_NAME])
 }
 
 function drawMap(mapName, mapData) {
-    if (!echarts.getMap(mapName)) {
-        echarts.registerMap(mapName, mapData)
-    }
+    // if (!echarts.getMap(mapName)) {
+    //     echarts.registerMap(mapName, mapData)
+    // }
+    echarts.registerMap(mapName, mapData)
 
     const mapDataArr = getMapRegions(mapName, mapData)
     const initPoints = getSamplePoints(MAP_CONFIG.DEFAULT_POINT_COUNT[0])
@@ -72,6 +82,30 @@ function drawMap(mapName, mapData) {
 
     generateAreaSelections(mapDataArr, oAreaSelect)
     generatePointCountSelections(MAP_CONFIG.DEFAULT_POINT_COUNT, oPointCount)
+}
+
+function drawDistrictMap() {
+    if (state.isDistrictLevel) return
+
+    state.isDistrictLevel = true
+    state.isAreaLevel = false
+    for (const key in state.mapData) {
+        if (key !== MAP_CONFIG.MAP_NAME) {
+            state.mapData[MAP_CONFIG.MAP_NAME].features.push(...state.mapData[key].features)
+        }
+    }
+    drawMap(MAP_CONFIG.MAP_NAME, state.mapData[MAP_CONFIG.MAP_NAME])
+}
+
+function drawAreaMap() {
+    if (state.isAreaLevel) return
+
+    state.isDistrictLevel = false
+    state.isAreaLevel = true
+    state.mapData[MAP_CONFIG.MAP_NAME].features = state.mapData[MAP_CONFIG.MAP_NAME].features.filter((item) => {
+        return item.properties.level !== 'district'
+    })
+    drawMap(MAP_CONFIG.MAP_NAME, state.mapData[MAP_CONFIG.MAP_NAME])
 }
 
 function getMapRegions(mapName, mapData) {
@@ -129,8 +163,12 @@ function getInitOptions(mapName, mapDataArr, points = []) {
                     show: true,
                 },
                 emphasis: {
-                    // color: '#fff'
+                    color: 'red'
                 }
+            },
+            scaleLimit: {
+                min: MAP_CONFIG.ZOOM_LIMIT.MIN,
+                max: MAP_CONFIG.ZOOM_LIMIT.MAX
             },
             regions: mapDataArr
         },
@@ -271,6 +309,21 @@ async function getData() {
     return data
 }
 
+function handleMapClick(param) {
+    const { componentType } = param
+
+    switch (componentType) {
+        case 'geo':
+            handleMapDrill(param)
+            break;
+        case 'series':
+            handleLabelClick(param)
+            break;
+        default:
+            break;
+    }
+}
+ 
 function handleMapDrill(param) {
     const isDrilled = state.mapData[param.name];
     if (isDrilled) {
@@ -279,6 +332,22 @@ function handleMapDrill(param) {
         drawMap(param.name, state.mapData[param.name]);
     } else {
         selectedArea(param)
+    }
+}
+
+function handleLabelClick(param) {
+    const { data } = param;
+    oLabelInfo.textContent = `${data.name}:${data.value.toString()}`
+}
+
+function handleRoamChange(param) {
+    const options = getOptions()
+    const currentZoom = typeof param === 'number' ? param : options.geo[0].zoom
+
+    if (currentZoom >= MAP_CONFIG.DISTRICT_LEVEL_ZOOM) {
+        drawDistrictMap()
+    } else {
+        drawAreaMap()
     }
 }
 
@@ -318,10 +387,15 @@ function handleReset() {
     oSearchValue.value = ''
     oPointCount.value = count
     oAreaSelect.value = center
+    oLabelInfo.textContent = ''
 
     const options = getOptions();
     options.geo[0].center = center.split(',')
     options.geo[0].zoom = MAP_CONFIG.DEFAULT_ZOOM
+
+    if (state.isDistrictLevel) {
+        drawAreaMap()
+    }
 
     handlePointCount(count, options)
 }
@@ -331,19 +405,26 @@ function handleZoom(e) {
     if (!action) return
 
     const options = getOptions()
-    const currentZoom = options.geo[0].zoom
+    let currentZoom = options.geo[0].zoom
 
     switch (action) {
         case MAP_CONFIG.ZOOM_IN:
-            options.geo[0].zoom = currentZoom + MAP_CONFIG.ZOOM_STEP
+            currentZoom = currentZoom + MAP_CONFIG.ZOOM_STEP
             break
         case MAP_CONFIG.ZOOM_OUT:
-            options.geo[0].zoom = currentZoom - MAP_CONFIG.ZOOM_STEP
+            currentZoom = currentZoom - MAP_CONFIG.ZOOM_STEP
             break
         default:
             break
     }
 
+    if (currentZoom < MAP_CONFIG.ZOOM_LIMIT.MIN || currentZoom > MAP_CONFIG.ZOOM_LIMIT.MAX) {
+        return
+    }
+
+    handleRoamChange(currentZoom)
+
+    options.geo[0].zoom = currentZoom
     setOptions(options)
 }
 
