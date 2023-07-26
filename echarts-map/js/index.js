@@ -64,10 +64,10 @@ async function initMap() {
     const chart = echarts.init(document.getElementById('box'));
     state.chart = chart
 
-    drawMap(MAP_CONFIG.MAP_NAME, state.mapData[MAP_CONFIG.MAP_NAME])
+    drawMap(MAP_CONFIG.MAP_NAME, state.mapData[MAP_CONFIG.MAP_NAME], true)
 }
 
-function drawMap(mapName, mapData) {
+function drawMap(mapName, mapData, isInit) {
     // if (!echarts.getMap(mapName)) {
     //     echarts.registerMap(mapName, mapData)
     // }
@@ -80,8 +80,10 @@ function drawMap(mapName, mapData) {
     setOptions(options)
     state.neItems = initPoints
 
-    generateAreaSelections(mapDataArr, oAreaSelect)
-    generatePointCountSelections(MAP_CONFIG.DEFAULT_POINT_COUNT, oPointCount)
+    if (isInit) {
+        generateAreaSelections(mapDataArr, oAreaSelect)
+        generatePointCountSelections(MAP_CONFIG.DEFAULT_POINT_COUNT, oPointCount)
+    }
 }
 
 function drawDistrictMap() {
