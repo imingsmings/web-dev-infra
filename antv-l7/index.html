@@ -4,14 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>antv-l7</title>
-    <!-- <script type="module" src="./index.js"></script> -->
 </head>
 <body>
     <div id="root">
         <div id="map"></div>
     </div>
-    <!-- <script src='https://unpkg.com/@antv/l7'></script> -->
-    <script src="./js/l7.js"></script>
-    <script src="./index.js"></script>
+    <script type="text/javascript">
+        window._AMapSecurityConfig = {
+          securityJsCode:"e8b5a0ac49cd10f335440bbb91ee627521",
+        }
+    </script>
+    <script src="https://webapi.amap.com/maps?v=2.0&key=38896138aa6d5816629d4502de53b59a5521"></script>
+    <script type="module" src="./index.js"></script>
+    <!-- <script>
+        const map = new AMap.Map('map', {
+            // viewMode: '3D',
+            mapStyle: 'amap://styles/light',
+            center: [ 121.435159, 31.256971 ],
+            zoom: 14.89,
+            minZoom: 10,
+            pitch: 80
+        });
+    </script> -->
 </body>
 </html>

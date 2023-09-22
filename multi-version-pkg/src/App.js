@@ -2,6 +2,9 @@ import logo from './logo.svg';
 import { useState } from 'react';
 import { Button } from 'antd';
 import { Button as Button4 } from 'antd4';
+
+import JsonView from './JsonView';
+
 import './App.css';
 
 function App() {
@@ -26,6 +29,7 @@ function App() {
           <Button4 type='secondary' onClick={handleMinus}>Minus</Button4>
         </div>
       </header>
+      <JsonView></JsonView>
     </div>
   );
 }
