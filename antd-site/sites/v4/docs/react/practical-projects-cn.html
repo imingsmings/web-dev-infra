@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh" data-direction="ltr" class="">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1890ff" />
+    <title>项目实战 - Ant Design</title>
+    <meta data-rh="true" property="og:type" content="website"/><meta data-rh="true" property="og:image" content="https://gw.alipayobjects.com/zos/rmsportal/rlpTLlbMzTNYuZGGCVYM.png"/><meta data-rh="true" property="og:title" content="项目实战 - Ant Design"/><meta data-rh="true" name="description" content="在真实项目开发中，你可能会需要 Redux 或者 MobX 这样的数据流方案，Ant Design React 作为一个 UI 库，可以和任何 React 生态圈内的数据流方案以及应用框架搭配使用。我们基于业务场景的场景，推出了可插拔的企业级应用框架 umi，推荐你在项目中使用。"/>
+    <link
+      rel="icon"
+      href="https://gw.alipayobjects.com/zos/rmsportal/rlpTLlbMzTNYuZGGCVYM.png"
+      type="image/x-icon"
+    />
+    
+    <link rel="stylesheet" type="text/css" href="/index-4fcbaf0b.css" />
+    
+    <style id="nprogress-style">
+      #nprogress {
+        display: none;
+      }
+    </style>
+    <link rel="stylesheet/less" type="text/css" href="/color.less" />
+    <script src="https://b.alicdn.com/s/polyfill.min.js?features=default,es2015,Intl"></script>
+    <link id="darkThemeLink" rel="stylesheet" href="/dark.css" />
+    <script>
+      /* 设置 meta theme-color 的值，默认会设置一个 #1890ff   */
+      function setColor(isDarken) {
+        try {
+          var theme = document.getElementsByTagName('meta')['theme-color'];
+          theme.setAttribute('content', isDarken ? 'rgba(0,0,0,0.65)' : '#1890ff');
+        } catch (error) {}
+      }
+      /* -------------------------- 主题相关 -------------------------- */
+      (function () {
+        /* 获取查询参数对象 */
+        function getSearchParam(search) {
+          // 处理入参错误
+          var search = search || location.search;
+          if (search === undefined) {
+            return;
+          }
+
+          var pattern = /(\w+)=(\w+)/gi; // 定义正则
+          var matches = search.match(pattern);
+          if (!matches) {
+            return;
+          }
+
+          function fromEntries(iterable) {
+            return iterable.reduce(function (obj, keyvalue) {
+              var key = keyvalue[0];
+              var val = keyvalue[1];
+              obj[key] = val;
+              return obj;
+            }, {});
+          }
+
+          var searchParam = fromEntries(
+            matches.map(function (item) {
+              return item.split('=');
+            }),
+          );
+          return searchParam;
+        }
+
+        var searchParam = getSearchParam(location.search) || {}; // 查询参数对象
+
+        var isDarkMode = searchParam.theme === 'dark'; // 判断当前主题
+        var isComponentsPage = location.pathname.indexOf('/components') === 0; // 判断是否组件页面
+
+        // 1. 暗色主题刷新时无白屏
+        // 如果是暗色主题，且在components路由下
+        var darkThemeLinkEl = document.getElementById('darkThemeLink');
+        if (isDarkMode && isComponentsPage) {
+          // 将预先定义的暗色主题link移动到body内
+          document.addEventListener(
+            'readystatechange',
+            function () {
+              document.head.appendChild(styleElement);
+            },
+            { once: true },
+          );
+          // load后卸载
+          window.addEventListener(
+            'load',
+            function () {
+              darkThemeLinkEl.parentNode.removeChild(darkThemeLinkEl);
+            },
+            { once: true },
+          );
+          setColor(true);
+          // 清除dark.css中的全部transition 待解析完后恢复
+          var styleElement = document.createElement('style');
+          styleElement.type = 'text/css';
+          styleElement.innerHTML =
+            '* {transition: none !important;} html {background: rgb(20, 20, 20)}';
+          document.head.appendChild(styleElement);
+          document.documentElement.style.backgroundColor = 'black';
+          window.addEventListener(
+            'load',
+            function () {
+              styleElement.parentNode.removeChild(styleElement);
+            },
+            { once: true },
+          );
+
+          // 设置系统主题
+          document.documentElement.style.colorScheme = 'dark';
+        } else {
+          setColor(false);
+          document.documentElement.style.colorScheme = 'light';
+          darkThemeLinkEl.parentNode.removeChild(darkThemeLinkEl);
+        }
+      })();
+    </script>
+    <script>
+      (function () {
+        function isLocalStorageNameSupported() {
+          var testKey = 'test';
+          var storage = window.localStorage;
+          try {
+            storage.setItem(testKey, '1');
+            storage.removeItem(testKey);
+            return true;
+          } catch (error) {
+            return false;
+          }
+        }
+        // 优先级提高到所有静态资源的前面，语言不对，加载其他静态资源没意义
+        var pathname = location.pathname;
+
+        function isZhCN(pathname) {
+          return /-cn\/?$/.test(pathname);
+        }
+        function getLocalizedPathname(path, zhCN) {
+          var pathname = path.indexOf('/') === 0 ? path : '/' + path;
+          if (!zhCN) {
+            // to enUS
+            return /\/?index-cn/.test(pathname) ? '/' : pathname.replace('-cn', '');
+          } else if (pathname === '/') {
+            return '/index-cn';
+          } else if (pathname.indexOf('/') === pathname.length - 1) {
+            return pathname.replace(/\/$/, '-cn/');
+          }
+          return pathname + '-cn';
+        }
+
+        // 兼容旧的 URL， `?locale=...`
+        var queryString = location.search;
+        if (queryString) {
+          var isZhCNConfig = queryString.indexOf('zh-CN') > -1;
+          if (isZhCNConfig && !isZhCN(pathname)) {
+            location.pathname = getLocalizedPathname(pathname, isZhCNConfig);
+          }
+        }
+
+        // 首页无视链接里面的语言设置 https://github.com/ant-design/ant-design/issues/4552
+        if (isLocalStorageNameSupported() && (pathname === '/' || pathname === '/index-cn')) {
+          var lang =
+            (window.localStorage && localStorage.getItem('locale')) ||
+            ((navigator.language || navigator.browserLanguage).toLowerCase() === 'zh-cn'
+              ? 'zh-CN'
+              : 'en-US');
+          // safari is 'zh-cn', while other browser is 'zh-CN';
+          if ((lang === 'zh-CN') !== isZhCN(pathname)) {
+            location.pathname = getLocalizedPathname(pathname, lang === 'zh-CN');
+          }
+        }
+        document.documentElement.className += isZhCN(pathname) ? 'zh-cn' : 'en-us';
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="react-content"><header id="header" class="clearfix"><div class="ant-row" style="flex-flow:nowrap;height:64px"><div class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-6 ant-col-lg-6 ant-col-xl-5 ant-col-xxl-4"><h1><a id="logo" href="/index-cn"><img alt="logo" src="https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg"/>Ant Design</a></h1></div><div class="ant-col menu-row ant-col-xs-0 ant-col-sm-0 ant-col-md-18 ant-col-lg-18 ant-col-xl-19 ant-col-xxl-20"><div id="search-box" class=""><span class="ant-input-affix-wrapper"><span class="ant-input-prefix"><span role="img" aria-label="search" class="anticon anticon-search"><svg viewBox="64 64 896 896" focusable="false" data-icon="search" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6a8.2 8.2 0 0011.6 0l43.6-43.5a8.2 8.2 0 000-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.2 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z"></path></svg></span></span><input type="text" placeholder="搜索" value="" class="ant-input"/></span></div><ul class="ant-menu ant-menu-root ant-menu-horizontal ant-menu-light menu-site" id="nav" dir="ltr" role="menu" tabindex="0" data-menu-list="true"><li class="ant-menu-item ant-menu-item-only-child" role="menuitem" tabindex="-1" data-menu-id="nav-docs/spec"><span class="ant-menu-title-content"><a href="/docs/spec/introduce-cn">设计</a></span></li><li class="ant-menu-item ant-menu-item-selected ant-menu-item-only-child" role="menuitem" tabindex="-1" data-menu-id="nav-docs/react"><span class="ant-menu-title-content"><a href="/docs/react/introduce-cn">文档</a></span></li><li class="ant-menu-item ant-menu-item-only-child" role="menuitem" tabindex="-1" data-menu-id="nav-components"><span class="ant-menu-title-content"><a href="/components/overview-cn/">组件</a></span></li></ul><div style="display:none" aria-hidden="true"></div><button type="button" class="ant-btn ant-btn-default ant-btn-sm header-button header-lang-button">English</button><button type="button" class="ant-btn ant-btn-default ant-btn-sm header-button header-direction-button"><span>RTL</span></button></div></div></header><div class="main-wrapper"><div class="ant-row"><div class="ant-col main-menu ant-col-xs-24 ant-col-sm-24 ant-col-md-6 ant-col-lg-6 ant-col-xl-5 ant-col-xxl-4"><div><div class=""><section class="main-menu-inner"><ul class="ant-menu ant-menu-root ant-menu-inline ant-menu-light aside-container menu-site" dir="ltr" role="menu" tabindex="0" data-menu-list="true"><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/introduce-cn">Ant Design of React</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/getting-started-cn">快速上手</a></span></li><li class="ant-menu-item ant-menu-item-selected ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/practical-projects-cn">项目实战</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/use-with-create-react-app-cn">在 create-react-app 中使用</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/use-in-typescript-cn">在 TypeScript 中使用</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/changelog-cn">更新日志</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/customize-theme-cn">定制主题</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/customize-theme-variable-cn">动态主题（实验性）</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/replace-moment-cn">替换 Moment.js</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/migration-v4-cn">从 v3 到 v4</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/recommendation-cn">社区精选组件</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/i18n-cn">国际化</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/faq-cn">FAQ</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/contributing-cn">贡献指南</a></span></li></ul><div style="display:none" aria-hidden="true"></div></section></div></div></div><div class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-18 ant-col-lg-18 ant-col-xl-19 ant-col-xxl-20"><section class="main-container"><article class="markdown"><div><h1>项目实战<a class="edit-button" href="https://github.com/ant-design/ant-design/edit/master/docs/react/practical-projects.zh-CN.md" target="_blank" rel="noopener noreferrer"><span role="img" aria-label="edit" class="anticon anticon-edit"><svg viewBox="64 64 896 896" focusable="false" data-icon="edit" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 000-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 009.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3-362.7 362.6-88.9 15.7 15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z"></path></svg></span></a></h1></div><div class="toc-affix"><div class=""><ul class="toc"><li><a class="bisheng-toc-h2" href="#安装-Umi" title="安装 Umi">安装 Umi</a></li><li><a class="bisheng-toc-h2" href="#新建路由" title="新建路由">新建路由</a></li><li><a class="bisheng-toc-h2" href="#编写-UI-Component" title="编写 UI Component">编写 UI Component</a></li><li><a class="bisheng-toc-h2" href="#简单数据流方案" title="简单数据流方案">简单数据流方案</a></li><li><a class="bisheng-toc-h2" href="#ProLayout" title="ProLayout">ProLayout</a></li><li><a class="bisheng-toc-h2" href="#ProTable" title="ProTable">ProTable</a></li><li><a class="bisheng-toc-h2" href="#构建应用" title="构建应用">构建应用</a></li><li><a class="bisheng-toc-h2" href="#下一步" title="下一步">下一步</a></li></ul></div></div><section class="markdown"><p>在真实项目开发中，你可能会需要 Redux 或者 MobX 这样的数据流方案，Ant Design React 作为一个 UI 库，可以和任何 React 生态圈内的数据流方案以及应用框架搭配使用。我们基于业务场景的场景，推出了可插拔的企业级应用框架 umi，推荐你在项目中使用。</p><p><a href="https://umijs.org/zh-CN">umi</a> 则是一个可插拔的企业级 react 应用框架。Umi 以路由为基础的，支持<a href="https://umijs.org/zh-CN/docs/convention-routing">类 next.js 的约定式路由</a>，以及各种进阶的路由功能，并以此进行功能扩展，比如<a href="https://umijs.org/zh-CN/config#dynamicimport">支持路由级的按需加载</a>。然后配以完善的<a href="https://umijs.org/zh-CN/plugins/api">插件体系</a>，覆盖从源码到构建产物的每个生命周期，支持各种功能扩展和业务需求。</p><blockquote><p>你可能也会对 <a href="https://pro.ant.design/">Ant Design Pro</a> 感兴趣，这是一个基于 Umi 和 antd 的开箱即用的中台前端/设计解决方案。</p></blockquote><p>本文会引导你使用 Umi 和 antd 从 0 开始创建一个简单应用。</p><h2 id="安装-Umi"><span>安装 Umi</span><a href="#安装-Umi" class="anchor">#</a></h2><p>推荐使用 yarn 创建 Umi 脚手架，执行以下命令。</p><pre class="language-bash"><code>$ <span class="token function">mkdir</span> myapp <span class="token operator">&amp;&amp;</span> <span class="token function">cd</span> myapp
+$ yarn create @umijs/umi-app
+$ yarn</code></pre><blockquote><p>如果你使用 npm，可执行 <code>npx @umijs/create-umi-app</code>，效果一致。</p><p>默认使用 <code>&quot;antd&quot;: &quot;^4.0.0&quot;</code>，如果要使用固定版本的 antd，你可以在项目里安装额外的 antd 依赖，<code>package.json</code> 里声明的 antd 依赖会被优先使用。</p></blockquote><h2 id="新建路由"><span>新建路由</span><a href="#新建路由" class="anchor">#</a></h2><p>我们要写个应用来先显示产品列表。首先第一步是创建路由，路由可以想象成是组成应用的不同页面。</p><p>然后通过命令创建 <code>/products</code> 路由，</p><pre class="language-bash"><code>$ npx umi g page products --typescript
+
+Write: src/pages/products.tsx
+Write: src/pages/products.css</code></pre><p>在 <code>.umirc.ts</code> 中配置路由，如果有国际化需要，可以配置 <code>locale</code> 开启 antd 国际化：</p><pre class="language-diff"><code>import { defineConfig } from 'umi';
+
+export default defineConfig({
+<span class="token inserted">+ locale: { antd: true },</span>
+  routes: [
+    { path: '/', component: '@/pages/index' },
+<span class="token inserted">+   { path: '/products', component: '@/pages/products' },</span>
+  ],
+});</code></pre><p>运行 <code>yarn start</code> 然后在浏览器里打开 <a href="http://localhost:8000/products">http://localhost:8000/products</a>，你应该能看到对应的页面。</p><h2 id="编写-UI-Component"><span>编写 UI Component</span><a href="#编写-UI-Component" class="anchor">#</a></h2><p>随着应用的发展，你会需要在多个页面分享 UI 元素 (或在一个页面使用多次)，在 Umi 里你可以把这部分抽成 component 。</p><p>我们来编写一个 <code>ProductList</code> component，这样就能在不同的地方显示产品列表了。</p><p>然后新建 <code>src/components/ProductList.tsx</code> 文件：</p><pre class="language-tsx"><code>import { Table<span class="token punctuation">,</span> Popconfirm<span class="token punctuation">,</span> Button } from <span class="token string">'antd'</span><span class="token comment" spellcheck="true">;</span>
+
+<span class="token keyword">const</span> ProductList<span class="token punctuation">:</span> React<span class="token punctuation">.</span>FC<span class="token operator">&lt;</span>{ products<span class="token punctuation">:</span> { name<span class="token punctuation">:</span> string }<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token comment" spellcheck="true">; onDelete: (id: string) => void }> = ({</span>
+  onDelete<span class="token punctuation">,</span>
+  products<span class="token punctuation">,</span>
+}<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> {
+  <span class="token keyword">const</span> columns <span class="token operator">=</span> <span class="token punctuation">[</span>
+    {
+      title<span class="token punctuation">:</span> <span class="token string">'Name'</span><span class="token punctuation">,</span>
+      dataIndex<span class="token punctuation">:</span> <span class="token string">'name'</span><span class="token punctuation">,</span>
+    }<span class="token punctuation">,</span>
+    {
+      title<span class="token punctuation">:</span> <span class="token string">'Actions'</span><span class="token punctuation">,</span>
+      render<span class="token punctuation">:</span> <span class="token punctuation">(</span>text<span class="token punctuation">,</span> record<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> {
+        return <span class="token punctuation">(</span>
+          <span class="token operator">&lt;</span>Popconfirm title<span class="token operator">=</span><span class="token string">"Delete?"</span> onConfirm<span class="token operator">=</span>{<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token function">onDelete</span><span class="token punctuation">(</span>record<span class="token punctuation">.</span>id<span class="token punctuation">)</span>}<span class="token operator">></span>
+            <span class="token operator">&lt;</span>Button<span class="token operator">></span>Delete<span class="token operator">&lt;</span><span class="token operator">/</span>Button<span class="token operator">></span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>Popconfirm<span class="token operator">></span>
+        <span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+      }<span class="token punctuation">,</span>
+    }<span class="token punctuation">,</span>
+  <span class="token punctuation">]</span><span class="token comment" spellcheck="true">;</span>
+  return <span class="token operator">&lt;</span>Table dataSource<span class="token operator">=</span>{products} columns<span class="token operator">=</span>{columns} <span class="token operator">/</span><span class="token operator">></span><span class="token comment" spellcheck="true">;</span>
+}<span class="token comment" spellcheck="true">;</span>
+
+export <span class="token keyword">default</span> ProductList<span class="token comment" spellcheck="true">;</span></code></pre><h2 id="简单数据流方案"><span>简单数据流方案</span><a href="#简单数据流方案" class="anchor">#</a></h2><p><code>@umijs/plugin-model</code> 是一种基于 hooks 范式的简单数据流方案，可以在一定情况下替代 dva 来进行中台的全局数据流。我们约定在 <code>src/models</code> 目录下的文件为项目定义的 model 文件。每个文件需要默认导出一个 function，该 function 定义了一个 Hook，不符合规范的文件我们会过滤掉。</p><p>文件名则对应最终 model 的 name，你可以通过插件提供的 API 来消费 model 中的数据。</p><p>我们以一个简单的表格作为示例。首先新建一个 <code>src/services/product.ts</code> 存放产品相关的接口。</p><pre class="language-tsx"><code><span class="token operator">/</span><span class="token operator">*</span>
+export function <span class="token function">queryProductList</span><span class="token punctuation">(</span><span class="token punctuation">)</span> {
+  return <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token string">'/api/products'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span>res <span class="token operator">=</span><span class="token operator">></span> res<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+}
+<span class="token operator">*</span><span class="token operator">/</span>
+<span class="token operator">/</span><span class="token operator">/</span> 先用 setTimeout 模拟一个请求，正常的写法如上所示
+export function <span class="token function">queryProductList</span><span class="token punctuation">(</span><span class="token punctuation">)</span> {
+  return new <span class="token function">Promise</span><span class="token punctuation">(</span>resolve <span class="token operator">=</span><span class="token operator">></span> {
+    <span class="token function">setTimeout</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> {
+      <span class="token function">resolve</span><span class="token punctuation">(</span>{
+        data<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+          { id<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span> name<span class="token punctuation">:</span> <span class="token string">'dva'</span> }<span class="token punctuation">,</span>
+          { id<span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">,</span> name<span class="token punctuation">:</span> <span class="token string">'antd'</span> }<span class="token punctuation">,</span>
+        <span class="token punctuation">]</span><span class="token punctuation">,</span>
+      }<span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+    }<span class="token punctuation">,</span> <span class="token number">2000</span><span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+  }<span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+}</code></pre><p>然后新建文件 <code>src/models/useProductList.ts</code>。</p><pre class="language-tsx"><code>import { useRequest } from <span class="token string">'umi'</span><span class="token comment" spellcheck="true">;</span>
+import { queryProductList } from <span class="token string">'@/services/product'</span><span class="token comment" spellcheck="true">;</span>
+
+export <span class="token keyword">default</span> function <span class="token function">useProductList</span><span class="token punctuation">(</span>params<span class="token punctuation">:</span> { pageSize<span class="token punctuation">:</span> number<span class="token comment" spellcheck="true">; current: number }) {</span>
+  <span class="token keyword">const</span> msg <span class="token operator">=</span> <span class="token function">useRequest</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token function">queryProductList</span><span class="token punctuation">(</span>params<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+
+  <span class="token keyword">const</span> deleteProducts <span class="token operator">=</span> async <span class="token punctuation">(</span>id<span class="token punctuation">:</span> string<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> {
+    try {
+      await <span class="token function">removeProducts</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+      message<span class="token punctuation">.</span><span class="token function">success</span><span class="token punctuation">(</span><span class="token string">'success'</span><span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+      msg<span class="token punctuation">.</span><span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+    } catch <span class="token punctuation">(</span>error<span class="token punctuation">)</span> {
+      message<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">'fail'</span><span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+    }
+  }<span class="token comment" spellcheck="true">;</span>
+
+  return {
+    dataSource<span class="token punctuation">:</span> msg<span class="token punctuation">.</span>data<span class="token punctuation">,</span>
+    reload<span class="token punctuation">:</span> msg<span class="token punctuation">.</span>run<span class="token punctuation">,</span>
+    loading<span class="token punctuation">:</span> msg<span class="token punctuation">.</span>loading<span class="token punctuation">,</span>
+    deleteProducts<span class="token punctuation">,</span>
+  }<span class="token comment" spellcheck="true">;</span>
+}</code></pre><p>编辑 <code>src/pages/products.tsx</code>，替换为以下内容：</p><pre class="language-tsx"><code>import { useModel } from <span class="token string">'umi'</span><span class="token comment" spellcheck="true">;</span>
+import ProductList from <span class="token string">'@/components/ProductList'</span><span class="token comment" spellcheck="true">;</span>
+
+<span class="token keyword">const</span> Products <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> {
+  <span class="token keyword">const</span> { dataSource<span class="token punctuation">,</span> reload<span class="token punctuation">,</span> deleteProducts } <span class="token operator">=</span> <span class="token function">useModel</span><span class="token punctuation">(</span><span class="token string">'useProductList'</span><span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+  return <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div<span class="token operator">></span>
+      <span class="token operator">&lt;</span>a onClick<span class="token operator">=</span>{<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token function">reload</span><span class="token punctuation">(</span><span class="token punctuation">)</span>}<span class="token operator">></span>reload<span class="token operator">&lt;</span><span class="token operator">/</span>a<span class="token operator">></span>
+      <span class="token operator">&lt;</span>ProductList onDelete<span class="token operator">=</span>{deleteProducts} products<span class="token operator">=</span>{dataSource} <span class="token operator">/</span><span class="token operator">></span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+}<span class="token comment" spellcheck="true">;</span>
+
+export <span class="token keyword">default</span> Products<span class="token comment" spellcheck="true">;</span></code></pre><p>执行启动命令：</p><pre class="language-bash"><code>$ yarn start</code></pre><p>访问 <a href="http://localhost:8000/">http://localhost:8000</a>，应该能看到以下效果：</p><p><img src="https://gw.alipayobjects.com/zos/antfincdn/dPsy4tFHN3/umi.gif"/></p><h2 id="ProLayout"><span>ProLayout</span><a href="#ProLayout" class="anchor">#</a></h2><p>一个标准的中后台页面，一般都需要一个布局，这个布局很多时候都是高度雷同的，ProLayout 封装了常用的菜单，面包屑，页头等功能，提供了一个不依赖的框架且开箱即用的高级布局组件。</p><p>并且支持 <code>side</code>, <code>mix</code>, <code>top</code> 三种模式，更是内置了菜单选中，菜单生成面包屑，自动设置页面标题的逻辑。可以帮助你快速的开始一个项目。</p><p><img src="https://gw.alipayobjects.com/zos/antfincdn/gXkuc%26RmT7/64038246-E2BF-4840-8898-5AF531897A44.png" alt="site"/></p><p>使用方式也是极为简单，只需要进行几个简单的设置。</p><pre class="language-tsx"><code>import { Button } from <span class="token string">'antd'</span><span class="token comment" spellcheck="true">;</span>
+import ProLayout<span class="token punctuation">,</span> { PageContainer } from <span class="token string">'@ant-design/pro-layout'</span><span class="token comment" spellcheck="true">;</span>
+
+export <span class="token keyword">default</span> <span class="token punctuation">(</span>
+  <span class="token operator">&lt;</span>ProLayout<span class="token operator">></span>
+    <span class="token operator">&lt;</span>PageContainer
+      extra<span class="token operator">=</span>{<span class="token punctuation">[</span>
+        <span class="token operator">&lt;</span>Button key<span class="token operator">=</span><span class="token string">"3"</span><span class="token operator">></span>Operating<span class="token operator">&lt;</span><span class="token operator">/</span>Button<span class="token operator">></span><span class="token punctuation">,</span>
+        <span class="token operator">&lt;</span>Button key<span class="token operator">=</span><span class="token string">"2"</span><span class="token operator">></span>Operating<span class="token operator">&lt;</span><span class="token operator">/</span>Button<span class="token operator">></span><span class="token punctuation">,</span>
+        <span class="token operator">&lt;</span>Button key<span class="token operator">=</span><span class="token string">"1"</span> type<span class="token operator">=</span><span class="token string">"primary"</span><span class="token operator">></span>
+          Main Operating
+        <span class="token operator">&lt;</span><span class="token operator">/</span>Button<span class="token operator">></span><span class="token punctuation">,</span>
+      <span class="token punctuation">]</span>}
+      footer<span class="token operator">=</span>{<span class="token punctuation">[</span><span class="token operator">&lt;</span>Button<span class="token operator">></span>reset<span class="token operator">&lt;</span><span class="token operator">/</span>Button<span class="token operator">></span><span class="token punctuation">,</span> <span class="token operator">&lt;</span>Button type<span class="token operator">=</span><span class="token string">"primary"</span><span class="token operator">></span>submit<span class="token operator">&lt;</span><span class="token operator">/</span>Button<span class="token operator">></span><span class="token punctuation">]</span>}
+    <span class="token operator">></span>
+      {children}
+    <span class="token operator">&lt;</span><span class="token operator">/</span>PageContainer<span class="token operator">></span>
+  <span class="token operator">&lt;</span><span class="token operator">/</span>ProLayout<span class="token operator">></span>
+<span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span></code></pre><p>点击这里<a href="https://procomponents.ant.design/components/layout">快速开始</a>。</p><h2 id="ProTable"><span>ProTable</span><a href="#ProTable" class="anchor">#</a></h2><p>一个中后台页面中很多数据都不需要跨页面共享，models 在一些时候也是不需要的。</p><pre class="language-tsx"><code>import ProTable from <span class="token string">'@ant-design/pro-table'</span><span class="token comment" spellcheck="true">;</span>
+import { Popconfirm<span class="token punctuation">,</span> Button } from <span class="token string">'antd'</span><span class="token comment" spellcheck="true">;</span>
+import { queryProductList } from <span class="token string">'@/services/product'</span><span class="token comment" spellcheck="true">;</span>
+
+<span class="token keyword">const</span> Products <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> {
+  <span class="token keyword">const</span> actionRef <span class="token operator">=</span> useRef<span class="token operator">&lt;</span>ActionType<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+
+  <span class="token keyword">const</span> deleteProducts <span class="token operator">=</span> async <span class="token punctuation">(</span>id<span class="token punctuation">:</span> string<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> {
+    try {
+      await <span class="token function">removeProducts</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+      message<span class="token punctuation">.</span><span class="token function">success</span><span class="token punctuation">(</span><span class="token string">'success'</span><span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+      actionRef<span class="token punctuation">.</span>current<span class="token operator">?</span><span class="token punctuation">.</span><span class="token function">reload</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+    } catch <span class="token punctuation">(</span>error<span class="token punctuation">)</span> {
+      message<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">'fail'</span><span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+    }
+  }<span class="token comment" spellcheck="true">;</span>
+
+  <span class="token keyword">const</span> columns <span class="token operator">=</span> <span class="token punctuation">[</span>
+    {
+      title<span class="token punctuation">:</span> <span class="token string">'Name'</span><span class="token punctuation">,</span>
+      dataIndex<span class="token punctuation">:</span> <span class="token string">'name'</span><span class="token punctuation">,</span>
+    }<span class="token punctuation">,</span>
+    {
+      title<span class="token punctuation">:</span> <span class="token string">'Actions'</span><span class="token punctuation">,</span>
+      render<span class="token punctuation">:</span> <span class="token punctuation">(</span>text<span class="token punctuation">,</span> record<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> {
+        return <span class="token punctuation">(</span>
+          <span class="token operator">&lt;</span>Popconfirm title<span class="token operator">=</span><span class="token string">"Delete?"</span> onConfirm<span class="token operator">=</span>{<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token function">onDelete</span><span class="token punctuation">(</span>record<span class="token punctuation">.</span>id<span class="token punctuation">)</span>}<span class="token operator">></span>
+            <span class="token operator">&lt;</span>Button<span class="token operator">></span>Delete<span class="token operator">&lt;</span><span class="token operator">/</span>Button<span class="token operator">></span>
+          <span class="token operator">&lt;</span><span class="token operator">/</span>Popconfirm<span class="token operator">></span>
+        <span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+      }<span class="token punctuation">,</span>
+    }<span class="token punctuation">,</span>
+  <span class="token punctuation">]</span><span class="token comment" spellcheck="true">;</span>
+
+  return <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>ProTable<span class="token operator">&lt;</span>{ name<span class="token punctuation">:</span> string }<span class="token operator">></span>
+      headerTitle<span class="token operator">=</span><span class="token string">"查询表格"</span>
+      actionRef<span class="token operator">=</span>{actionRef}
+      rowKey<span class="token operator">=</span><span class="token string">"name"</span>
+      request<span class="token operator">=</span>{<span class="token punctuation">(</span>params<span class="token punctuation">,</span> sorter<span class="token punctuation">,</span> filter<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token function">queryProductList</span><span class="token punctuation">(</span>{ <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>params<span class="token punctuation">,</span> sorter<span class="token punctuation">,</span> filter }<span class="token punctuation">)</span>}
+      columns<span class="token operator">=</span>{columns}
+    <span class="token operator">/</span><span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token comment" spellcheck="true">;</span>
+}<span class="token comment" spellcheck="true">;</span></code></pre><p>ProTable 提供了预设逻辑来处理 loading，分页 和搜索表单，可以大大减少代码量，点击这里<a href="https://procomponents.ant.design/components/table">快速开始</a>。</p><h2 id="构建应用"><span>构建应用</span><a href="#构建应用" class="anchor">#</a></h2><p>完成开发并且在开发环境验证之后，就需要部署给我们的用户了，执行以下命令：</p><pre class="language-bash"><code>$ yarn build</code></pre><p><img src="https://gw.alipayobjects.com/zos/antfincdn/Zd3f%242NdOK/b911d244-f1a5-4d61-adc5-3710cd86cd1b.png" alt="build"/></p><p>构建会打包所有的资源，包含 JavaScript, CSS, web fonts, images, html 等。你可以在 <code>dist/</code> 目录下找到这些文件。</p><h2 id="下一步"><span>下一步</span><a href="#下一步" class="anchor">#</a></h2><p>我们已经完成了一个简单应用，你可能还有很多疑问，比如：</p><ul><li><p>如何统一处理出错？</p></li><li><p>如何处理更多路由，比如动态路由，嵌套路由，权限路由等？</p></li><li><p>如何 mock 数据？</p></li><li><p>如何部署？</p></li><li><p>等等</p></li></ul><p>你可以：</p><ul><li><p>访问 <a href="https://umijs.org/">Umi 官网</a></p></li><li><p>理解 <a href="https://umijs.org/zh-CN/docs/routing">Umi 的路由</a></p></li><li><p>理解 <a href="https://umijs.org/zh-CN/docs/deployment">如何部署 Umi 应用</a></p></li><li><p>开箱即用的脚手架 <a href="https://pro.ant.design">Ant Design Pro</a></p></li><li><p>高级布局 <a href="https://procomponents.ant.design/components/layout">ProLayout</a></p></li><li><p>高级表格 <a href="https://procomponents.ant.design/components/table">ProTable</a></p></li></ul></section><section class="markdown api-container"></section></article><div class="contributors-list" style="display:flex;list-style:none;margin:0;padding:0"><span style="opacity:0.3" class="ant-avatar ant-avatar-circle"><span class="ant-avatar-string" style="opacity:0"></span></span></div></section><section class="prev-next-nav"><a class="prev-page" href="/docs/react/getting-started-cn"><span role="img" aria-label="left" class="anticon anticon-left footer-nav-icon-before"><svg viewBox="64 64 896 896" focusable="false" data-icon="left" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 000 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path></svg></span>快速上手<span role="img" aria-label="right" class="anticon anticon-right footer-nav-icon-after"><svg viewBox="64 64 896 896" focusable="false" data-icon="right" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 00302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 000-50.4z"></path></svg></span></a><a class="next-page" href="/docs/react/use-with-create-react-app-cn"><span role="img" aria-label="left" class="anticon anticon-left footer-nav-icon-before"><svg viewBox="64 64 896 896" focusable="false" data-icon="left" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 000 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path></svg></span>在 create-react-app 中使用<span role="img" aria-label="right" class="anticon anticon-right footer-nav-icon-after"><svg viewBox="64 64 896 896" focusable="false" data-icon="right" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 00302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 000-50.4z"></path></svg></span></a></section></div></div></div></div>
+    
+    <script src="/anticon~83be3271.edb224.js"></script>
+    
+    <script src="/anticon~2c1e1bc1.bbd8bd.js"></script>
+    
+    <script src="/anticon~aff8b51d.90a887.js"></script>
+    
+    <script src="/anticon~b39e3fdb.f6e8fc.js"></script>
+    
+    <script src="/anticon~ee4fcf7a.d3f72d.js"></script>
+    
+    <script src="/anticon~e0710ea3.aa4333.js"></script>
+    
+    <script src="/components.c97666.js"></script>
+    
+    <script src="/index-372f28a1.js"></script>
+    
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-72788897-1"></script>
+    <script>
+      if (!location.port) {
+        // Enable Google Analytics
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+          dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'UA-72788897-1');
+      }
+    </script>
+    <!-- Hotjar Tracking Code for ant.design -->
+    <script>
+      (function (h, o, t, j, a, r) {
+        if (location.hostname === 'localhost') {
+          return;
+        }
+
+        h.hj =
+          h.hj ||
+          function () {
+            (h.hj.q = h.hj.q || []).push(arguments);
+          };
+        h._hjSettings = { hjid: 473408, hjsv: 5 };
+        a = o.getElementsByTagName('head')[0];
+        r = o.createElement('script');
+        r.async = 1;
+        r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
+        a.appendChild(r);
+      })(window, document, '//static.hotjar.com/c/hotjar-', '.js?sv=');
+    </script>
+
+    <!--
+      感谢每位为开源理想而奋斗的人们，愿你们在人生新的旅途一帆风顺！~
+      https://gw.alipayobjects.com/mdn/rms_08e378/afts/img/A*_7M0S7zdFBcAAAAAAAAAAAAAARQnAQ
+
+      2021.05.21
+    -->
+  </body>
+</html>

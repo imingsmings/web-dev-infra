@@ -1,0 +1,20 @@
+{
+  "name": "antd-site",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start-all": "npm-run-all --parallel app v5 v4 v3 pc",
+    "app": "node ./app.js",
+    "v5": "node ./scripts/v5.js",
+    "v4": "node ./scripts/v4.js",
+    "v3": "node ./scripts/v3.js",
+    "pc": "node ./scripts/pc.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
