@@ -38,16 +38,10 @@
 </head>
 <body>
     <div class="contianer"></div>
+    <script id='tpl'> </script>
     <script>
         const hostAddress = `${location.protocol}//${location.hostname}`
-        const basePort = Number(location.port)
-
-        const items = [
-            'Ant Design V5',
-            'Ant Design V4',
-            'Ant Design V3',
-            'Ant Design Pro Components',
-        ]
+        const items = JSON.parse(document.querySelector('#tpl').textContent)
 
         const init = () => {
             setItems(items, appendConent)
@@ -61,10 +55,10 @@
             items.forEach((item, index) => {
                 const oA = document.createElement('a')
                 oA.className = 'item'
-                oA.href = `${hostAddress}:${basePort + index + 1}`
-                oA.title = item
+                oA.href = item.origin
+                oA.title = item.ttile
                 oA.target = '_blank'
-                oA.textContent = item
+                oA.textContent = item.title
 
                 oFrag.appendChild(oA)
             })

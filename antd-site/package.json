@@ -4,7 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "dev": "npm-run-all --parallel app:dev v5 v4 v3 pc",
     "start": "npm-run-all --parallel app v5 v4 v3 pc",
+    "app:dev": "nodemon ./app.js",
     "app": "node ./app.js",
     "v5": "node ./scripts/v5.js",
     "v4": "node ./scripts/v4.js",
