@@ -1,0 +1,10 @@
+# Contributors by commit history
+https://github.com/mdn/content/commits/main/files/en-us/web/progressive_web_apps/tutorials/js13kgames/app_structure/index.md
+
+# Original Wiki contributors
+Audaciter
+mfuji09
+chrisdavidmills
+jncraton
+end3r
+jswisher

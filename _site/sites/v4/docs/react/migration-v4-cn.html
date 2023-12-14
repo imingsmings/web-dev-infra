@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh" data-direction="ltr" class="">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1890ff" />
+    <title>从 v3 到 v4 - Ant Design</title>
+    <meta data-rh="true" property="og:type" content="website"/><meta data-rh="true" property="og:image" content="https://gw.alipayobjects.com/zos/rmsportal/rlpTLlbMzTNYuZGGCVYM.png"/><meta data-rh="true" property="og:title" content="从 v3 到 v4 - Ant Design"/><meta data-rh="true" name="description" content="本文档将帮助你从 antd 3.x 版本升级到 antd 4.x 版本，如果你是 2.x 或者更老的版本，请先参考之前的升级文档升级到 3.x。"/>
+    <link
+      rel="icon"
+      href="https://gw.alipayobjects.com/zos/rmsportal/rlpTLlbMzTNYuZGGCVYM.png"
+      type="image/x-icon"
+    />
+    
+    <link rel="stylesheet" type="text/css" href="/index-4fcbaf0b.css" />
+    
+    <style id="nprogress-style">
+      #nprogress {
+        display: none;
+      }
+    </style>
+    <link rel="stylesheet/less" type="text/css" href="/color.less" />
+    <script src="https://b.alicdn.com/s/polyfill.min.js?features=default,es2015,Intl"></script>
+    <link id="darkThemeLink" rel="stylesheet" href="/dark.css" />
+    <script>
+      /* 设置 meta theme-color 的值，默认会设置一个 #1890ff   */
+      function setColor(isDarken) {
+        try {
+          var theme = document.getElementsByTagName('meta')['theme-color'];
+          theme.setAttribute('content', isDarken ? 'rgba(0,0,0,0.65)' : '#1890ff');
+        } catch (error) {}
+      }
+      /* -------------------------- 主题相关 -------------------------- */
+      (function () {
+        /* 获取查询参数对象 */
+        function getSearchParam(search) {
+          // 处理入参错误
+          var search = search || location.search;
+          if (search === undefined) {
+            return;
+          }
+
+          var pattern = /(\w+)=(\w+)/gi; // 定义正则
+          var matches = search.match(pattern);
+          if (!matches) {
+            return;
+          }
+
+          function fromEntries(iterable) {
+            return iterable.reduce(function (obj, keyvalue) {
+              var key = keyvalue[0];
+              var val = keyvalue[1];
+              obj[key] = val;
+              return obj;
+            }, {});
+          }
+
+          var searchParam = fromEntries(
+            matches.map(function (item) {
+              return item.split('=');
+            }),
+          );
+          return searchParam;
+        }
+
+        var searchParam = getSearchParam(location.search) || {}; // 查询参数对象
+
+        var isDarkMode = searchParam.theme === 'dark'; // 判断当前主题
+        var isComponentsPage = location.pathname.indexOf('/components') === 0; // 判断是否组件页面
+
+        // 1. 暗色主题刷新时无白屏
+        // 如果是暗色主题，且在components路由下
+        var darkThemeLinkEl = document.getElementById('darkThemeLink');
+        if (isDarkMode && isComponentsPage) {
+          // 将预先定义的暗色主题link移动到body内
+          document.addEventListener(
+            'readystatechange',
+            function () {
+              document.head.appendChild(styleElement);
+            },
+            { once: true },
+          );
+          // load后卸载
+          window.addEventListener(
+            'load',
+            function () {
+              darkThemeLinkEl.parentNode.removeChild(darkThemeLinkEl);
+            },
+            { once: true },
+          );
+          setColor(true);
+          // 清除dark.css中的全部transition 待解析完后恢复
+          var styleElement = document.createElement('style');
+          styleElement.type = 'text/css';
+          styleElement.innerHTML =
+            '* {transition: none !important;} html {background: rgb(20, 20, 20)}';
+          document.head.appendChild(styleElement);
+          document.documentElement.style.backgroundColor = 'black';
+          window.addEventListener(
+            'load',
+            function () {
+              styleElement.parentNode.removeChild(styleElement);
+            },
+            { once: true },
+          );
+
+          // 设置系统主题
+          document.documentElement.style.colorScheme = 'dark';
+        } else {
+          setColor(false);
+          document.documentElement.style.colorScheme = 'light';
+          darkThemeLinkEl.parentNode.removeChild(darkThemeLinkEl);
+        }
+      })();
+    </script>
+    <script>
+      (function () {
+        function isLocalStorageNameSupported() {
+          var testKey = 'test';
+          var storage = window.localStorage;
+          try {
+            storage.setItem(testKey, '1');
+            storage.removeItem(testKey);
+            return true;
+          } catch (error) {
+            return false;
+          }
+        }
+        // 优先级提高到所有静态资源的前面，语言不对，加载其他静态资源没意义
+        var pathname = location.pathname;
+
+        function isZhCN(pathname) {
+          return /-cn\/?$/.test(pathname);
+        }
+        function getLocalizedPathname(path, zhCN) {
+          var pathname = path.indexOf('/') === 0 ? path : '/' + path;
+          if (!zhCN) {
+            // to enUS
+            return /\/?index-cn/.test(pathname) ? '/' : pathname.replace('-cn', '');
+          } else if (pathname === '/') {
+            return '/index-cn';
+          } else if (pathname.indexOf('/') === pathname.length - 1) {
+            return pathname.replace(/\/$/, '-cn/');
+          }
+          return pathname + '-cn';
+        }
+
+        // 兼容旧的 URL， `?locale=...`
+        var queryString = location.search;
+        if (queryString) {
+          var isZhCNConfig = queryString.indexOf('zh-CN') > -1;
+          if (isZhCNConfig && !isZhCN(pathname)) {
+            location.pathname = getLocalizedPathname(pathname, isZhCNConfig);
+          }
+        }
+
+        // 首页无视链接里面的语言设置 https://github.com/ant-design/ant-design/issues/4552
+        if (isLocalStorageNameSupported() && (pathname === '/' || pathname === '/index-cn')) {
+          var lang =
+            (window.localStorage && localStorage.getItem('locale')) ||
+            ((navigator.language || navigator.browserLanguage).toLowerCase() === 'zh-cn'
+              ? 'zh-CN'
+              : 'en-US');
+          // safari is 'zh-cn', while other browser is 'zh-CN';
+          if ((lang === 'zh-CN') !== isZhCN(pathname)) {
+            location.pathname = getLocalizedPathname(pathname, lang === 'zh-CN');
+          }
+        }
+        document.documentElement.className += isZhCN(pathname) ? 'zh-cn' : 'en-us';
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="react-content"><header id="header" class="clearfix"><div class="ant-row" style="flex-flow:nowrap;height:64px"><div class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-6 ant-col-lg-6 ant-col-xl-5 ant-col-xxl-4"><h1><a id="logo" href="/index-cn"><img alt="logo" src="https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg"/>Ant Design</a></h1></div><div class="ant-col menu-row ant-col-xs-0 ant-col-sm-0 ant-col-md-18 ant-col-lg-18 ant-col-xl-19 ant-col-xxl-20"><div id="search-box" class=""><span class="ant-input-affix-wrapper"><span class="ant-input-prefix"><span role="img" aria-label="search" class="anticon anticon-search"><svg viewBox="64 64 896 896" focusable="false" data-icon="search" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6a8.2 8.2 0 0011.6 0l43.6-43.5a8.2 8.2 0 000-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.2 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z"></path></svg></span></span><input type="text" placeholder="搜索" value="" class="ant-input"/></span></div><ul class="ant-menu ant-menu-root ant-menu-horizontal ant-menu-light menu-site" id="nav" dir="ltr" role="menu" tabindex="0" data-menu-list="true"><li class="ant-menu-item ant-menu-item-only-child" role="menuitem" tabindex="-1" data-menu-id="nav-docs/spec"><span class="ant-menu-title-content"><a href="/docs/spec/introduce-cn">设计</a></span></li><li class="ant-menu-item ant-menu-item-selected ant-menu-item-only-child" role="menuitem" tabindex="-1" data-menu-id="nav-docs/react"><span class="ant-menu-title-content"><a href="/docs/react/introduce-cn">文档</a></span></li><li class="ant-menu-item ant-menu-item-only-child" role="menuitem" tabindex="-1" data-menu-id="nav-components"><span class="ant-menu-title-content"><a href="/components/overview-cn/">组件</a></span></li></ul><div style="display:none" aria-hidden="true"></div><button type="button" class="ant-btn ant-btn-default ant-btn-sm header-button header-lang-button">English</button><button type="button" class="ant-btn ant-btn-default ant-btn-sm header-button header-direction-button"><span>RTL</span></button></div></div></header><div class="main-wrapper"><div class="ant-row"><div class="ant-col main-menu ant-col-xs-24 ant-col-sm-24 ant-col-md-6 ant-col-lg-6 ant-col-xl-5 ant-col-xxl-4"><div><div class=""><section class="main-menu-inner"><ul class="ant-menu ant-menu-root ant-menu-inline ant-menu-light aside-container menu-site" dir="ltr" role="menu" tabindex="0" data-menu-list="true"><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/introduce-cn">Ant Design of React</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/getting-started-cn">快速上手</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/practical-projects-cn">项目实战</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/use-with-create-react-app-cn">在 create-react-app 中使用</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/use-in-typescript-cn">在 TypeScript 中使用</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/changelog-cn">更新日志</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/customize-theme-cn">定制主题</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/customize-theme-variable-cn">动态主题（实验性）</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/replace-moment-cn">替换 Moment.js</a></span></li><li class="ant-menu-item ant-menu-item-selected ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/migration-v4-cn">从 v3 到 v4</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/recommendation-cn">社区精选组件</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/i18n-cn">国际化</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/faq-cn">FAQ</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/react/contributing-cn">贡献指南</a></span></li></ul><div style="display:none" aria-hidden="true"></div></section></div></div></div><div class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-18 ant-col-lg-18 ant-col-xl-19 ant-col-xxl-20"><section class="main-container"><article class="markdown"><div><h1>从 v3 到 v4<a class="edit-button" href="https://github.com/ant-design/ant-design/edit/master/docs/react/migration-v4.zh-CN.md" target="_blank" rel="noopener noreferrer"><span role="img" aria-label="edit" class="anticon anticon-edit"><svg viewBox="64 64 896 896" focusable="false" data-icon="edit" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 000-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 009.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3-362.7 362.6-88.9 15.7 15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z"></path></svg></span></a></h1></div><div class="toc-affix"><div class=""><ul class="toc"><li><a class="bisheng-toc-h2" href="#升级准备" title="升级准备">升级准备</a></li><li><a class="bisheng-toc-h2" href="#4.0-有哪些不兼容的变化" title="4.0 有哪些不兼容的变化">4.0 有哪些不兼容的变化</a></li><li><a class="bisheng-toc-h2" href="#开始升级" title="开始升级">开始升级</a></li><li><a class="bisheng-toc-h2" href="#遇到问题" title="遇到问题">遇到问题</a></li></ul></div></div><section class="markdown"><p>本文档将帮助你从 antd <code>3.x</code> 版本升级到 antd <code>4.x</code> 版本，如果你是 <code>2.x</code> 或者更老的版本，请先参考之前的<a href="https://github.com/ant-design/ant-design/blob/2adf8ced24da7b3cb46a3475854a83d76a98c536/CHANGELOG.zh-CN.md#300">升级文档</a>升级到 3.x。</p><h2 id="升级准备"><span>升级准备</span><a href="#升级准备" class="anchor">#</a></h2><ol><li><p>请先升级到 3.x 的最新版本，按照控制台 warning 信息移除/修改相关的 API。</p></li><li><p>升级项目 React 16.12.0 以上。</p><ul><li><p>如果你仍在使用 React 15，请参考 <a href="https://reactjs.org/blog/2017/09/26/react-v16.0.html#breaking-changes">React 16 升级文档</a>。</p></li><li><p>其余 React 16 废弃生命周期 API 请参考 <a href="https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#gradual-migration-path">迁移导引</a>。</p></li></ul></li></ol><h2 id="4.0-有哪些不兼容的变化"><span>4.0 有哪些不兼容的变化</span><a href="#4.0-有哪些不兼容的变化" class="anchor">#</a></h2><h3 id="设计规范调整"><span>设计规范调整</span><a href="#设计规范调整" class="anchor">#</a></h3><ul><li><p>行高从 <code>1.5</code>(<code>21px</code>) 调整为 <code>1.5715</code>(<code>22px</code>)。</p></li><li><p>字体颜色从 <code>rgba(0, 0, 0, 0.65)</code> 调深为 <code>rgba(0, 0, 0, 0.85)</code>。<code>4.6.0</code></p></li><li><p>基础圆角调整，由 <code>4px</code> 改为 <code>2px</code>。</p></li><li><p>Selected 颜色和 Hovered 颜色进行了交换。</p></li><li><p>全局阴影优化，调整为三层阴影区分控件层次关系。</p></li><li><p>气泡确认框中图标的使用改变，由问号改为感叹号。</p></li><li><p>部分组件选中颜色统一改为 <code>@blue-1: #E6F7FF</code>，对应 <code>hover</code> 颜色改为 <code>@gray-2: #FAFAFA</code>。</p></li><li><p>报错色色值调整，由 <code>@red-5: #F5222D</code> 改为 <code>@red-5: #FF4D4F</code>。</p></li><li><p>分割线颜色明度降低，由 <code>#E8E8E8</code> 改为 <code>#F0F0F0</code>。</p></li><li><p>DatePicker 交互重做，面板和输入框分离，范围选择现可单独选择开始和结束时间。</p></li><li><p>Table 默认背景颜色从透明修改为白色。</p></li><li><p>Tabs 火柴棍样式缩短为和文字等长。</p></li><li><p>Tabs 交互重做，DOM 结构改变。<code>4.3.0</code></p></li></ul><h3 id="兼容性调整"><span>兼容性调整</span><a href="#兼容性调整" class="anchor">#</a></h3><ul><li><p>IE 最低支持版本为 IE 11。</p></li><li><p>React 最低支持版本为 React 16.9，部分组件开始使用 hooks 进行重构。</p><ul><li><p>重构通过 <code>useMemo</code> 进行性能优化，请勿使用 mutable data 作为参数。</p></li></ul></li><li><p>最低支持的 less 版本为 3.1.0，建议升级到 less 4.x 最新版本。</p></li></ul><h4 id="移除废弃的-API"><span>移除废弃的 API</span><a href="#移除废弃的-API" class="anchor">#</a></h4><ul><li><p>移除了 LocaleProvider，请使用 <code>ConfigProvider</code> 替代。</p></li><li><p>移除了 Mention，请使用 <code>Mentions</code> 替代。</p></li><li><p>移除了 Alert 的 <code>iconType</code> 属性，请使用 <code>icon</code> 替代。</p></li><li><p>移除了 Modal.xxx 的 <code>iconType</code> 属性，请使用 <code>icon</code> 替代。</p></li><li><p>移除了 Form.create 方法，<code>form</code> 现可由 <code>Form.useForm</code> 获取。</p></li><li><p>移除了 Form.Item 的 <code>id</code> 属性，请使用 <code>htmlFor</code> 替代。</p></li><li><p>移除了 Typography 的 <code>setContentRef</code> 属性，请使用 <code>ref</code> 替代。</p></li><li><p>移除了 TimePicker 的 <code>allowEmpty</code> 属性，请使用 <code>allowClear</code> 替代。</p></li><li><p>移除了 Tag 的 <code>afterClose</code> 属性，请使用 <code>onClose</code> 替代。</p></li><li><p>移除了 Card 的 <code>noHovering</code> 属性，请使用 <code>hoverable</code> 替代。</p></li><li><p>移除了 Carousel 的 <code>vertical</code> 属性，请使用 <code>dotPosition</code> 替代。</p></li><li><p>移除了 Drawer 的 <code>wrapClassName</code> 属性，请使用 <code>className</code> 替代。</p></li><li><p>移除了 TextArea 的 <code>autosize</code> 属性，请使用 <code>autoSize</code> 替代。</p></li><li><p>移除了 Affix 的 <code>offset</code> 属性，请使用 <code>offsetTop</code> 替代。</p></li><li><p>移除了 Transfer 的 <code>onSearchChange</code> 属性，请使用 <code>onSearch</code> 替代。</p></li><li><p>移除了 Transfer 的 <code>body</code> 属性，请使用 <code>children</code> 替代。</p></li><li><p>移除了 Transfer 的 <code>lazy</code> 属性，它并没有起到真正的优化效果。</p></li><li><p>移除了 Select 的 <code>combobox</code> 模式，请使用 <code>AutoComplete</code> 替代。</p></li><li><p>移除了 Table 的 <code>rowSelection.hideDefaultSelections</code> 属性，请在 <code>rowSelection.selections</code> 中使用 <code>SELECTION_ALL</code> 和 <code>SELECTION_INVERT</code> 替代，<a href="/components/table-cn/#components-table-demo-row-selection-custom">自定义选择项</a>。</p></li><li><p>废弃 Button.Group，请使用 <code>Space</code> 代替。</p></li></ul><h4 id="图标升级"><span>图标升级</span><a href="#图标升级" class="anchor">#</a></h4><p>在 <code>antd@3.9.0</code> 中，我们引入了 svg 图标（<a href="https://github.com/ant-design/ant-design/issues/10353">为何使用 svg 图标？</a>）。使用了字符串命名的图标 API 无法做到按需加载，因而全量引入了 svg 图标文件，这大大增加了打包产物的尺寸。在 4.0 中，我们调整了图标的使用 API 从而支持 tree shaking，减少 antd 默认包体积约 150 KB(Gzipped)。</p><p>旧版 Icon 使用方式将被废弃：</p><pre class="language-jsx"><code><span class="token keyword">import</span> <span class="token punctuation">{</span> Icon<span class="token punctuation">,</span> Button <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'antd'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> Demo <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">(</span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>Icon</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>smile<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>Button</span> <span class="token attr-name">icon</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>smile<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre><p>4.0 中会采用按需引入的方式：</p><pre class="language-diff"><code>  import { Button } from 'antd';
+
+  // tree-shaking supported
+<span class="token deleted">- import { Icon } from 'antd';</span>
+<span class="token inserted">+ import { SmileOutlined } from '@ant-design/icons';</span>
+
+  const Demo = () => (
+    &lt;div>
+<span class="token deleted">-     &lt;Icon type="smile" /></span>
+<span class="token inserted">+     &lt;SmileOutlined /></span>
+      &lt;Button icon={&lt;SmileOutlined />} />
+    &lt;/div>
+  );
+
+  // or directly import
+  import SmileOutlined from '@ant-design/icons/SmileOutlined';</code></pre><p>你将仍然可以通过兼容包继续使用：</p><pre class="language-jsx"><code><span class="token keyword">import</span> <span class="token punctuation">{</span> Button <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'antd'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> Icon <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@ant-design/compatible'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> Demo <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">(</span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>Icon</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>smile<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>Button</span> <span class="token attr-name">icon</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>smile<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre><h4 id="组件重构"><span>组件重构</span><a href="#组件重构" class="anchor">#</a></h4><ul><li><p>Form 重写</p><ul><li><p>不再需要 <code>Form.create</code>。</p></li><li><p>嵌套字段支持从 <code>&#x27;xxx.yyy&#x27;</code> 改成 <code>[&#x27;xxx&#x27;, &#x27;yyy&#x27;]</code>。</p></li><li><p><code>validateTrigger</code> 不再收集字段值。</p></li><li><p>迁移文档请查看<a href="/components/form/v3-cn/">此处</a>。</p></li></ul></li><li><p>DatePicker 重写</p><ul><li><p>提供 <code>picker</code> 属性用于选择器切换。</p></li><li><p>范围选择现在可以单独选择开始和结束时间。</p></li><li><p><code>onPanelChange</code> 在面板值变化时也会触发。</p></li><li><p><a href="/components/date-picker-cn-cn/#components-date-picker-demo-date-render">自定义单元格样式</a>的类名从 <code>ant-calendar-date</code> 改为 <code>ant-picker-cell-inner</code>。</p></li></ul></li><li><p>Tree、Select、TreeSelect、AutoComplete 重新写</p><ul><li><p>使用虚拟滚动。</p></li><li><p><code>onBlur</code> 时不再修改选中值，且返回 React 原生的 <code>event</code> 对象。</p><ul><li><p>如果你在使用兼容包的 Form 且配置了 <code>validateTrigger</code> 为 <code>onBlur</code>，请改至 <code>onChange</code> 以做兼容。</p></li></ul></li><li><p>AutoComplete 不再支持 <code>optionLabelProp</code>，请直接设置 Option <code>value</code> 属性。</p></li><li><p>AutoComplete 选项与 Select 对齐，请使用 <code>options</code> 代替 <code>dataSource</code>。</p></li><li><p>Select 移除 <code>dropdownMenuStyle</code> 属性。</p></li><li><p>如果你需要设置弹窗高度请使用 <code>listHeight</code> 来代替 <code>dropdownStyle</code> 的高度样式。</p></li><li><p><code>filterOption</code> 第二个参数直接返回原数据，不在需要通过 <code>option.props.children</code> 来进行匹配。</p></li><li><p>Tree、TreeSelect 同时指定 <code>title</code> 和 <code>label</code> 的时候，会选择显示 <code>label</code>。为了 <code>labelInValue</code> 行为一致进行了该调整。<a href="https://codesandbox.io/s/keen-curran-d3qnp">新行为</a>（在第一个节点展示 &#x27;label&#x27;），<a href="https://codesandbox.io/s/muddy-darkness-57lb3">旧行为</a>（在第一个节点展示 &#x27;title&#x27;）。</p></li><li><p>Tree 传入内容采用 <code>treeData</code> 属性，来代替 <code>TreeNode</code> 方式，TreeNode 依然可用，但是会在控制台抛出警告。</p></li></ul></li><li><p>Grid 组件使用 flex 布局。</p></li><li><p>Button 的 <code>danger</code> 现在作为一个属性而不是按钮类型。</p></li><li><p>Input、Select 的 <code>value</code> 为 <code>undefined</code> 时改为非受控状态。</p></li><li><p>Table 重写</p><ul><li><p>在没有 <code>columns</code> 时仍然会保留一列。</p></li><li><p>嵌套 <code>dataIndex</code> 支持从 <code>&#x27;xxx.yyy&#x27;</code> 改成 <code>[&#x27;xxx&#x27;, &#x27;yyy&#x27;]</code>。</p></li></ul></li><li><p>Pagination 重写</p><ul><li><p>自 <code>4.1.0</code> 起大于 50 条数据默认会展示 <code>pageSize</code> 切换器，这条规则同样会运用于 Table 上。</p></li><li><p><code>onChange</code> 方法在 <code>pageSize</code> 值改变时也会触发。</p></li></ul></li><li><p>Tabs 重写（<a href="https://github.com/ant-design/ant-design/pull/24552">4.3.0</a>）</p><ul><li><p>Dom 结构变化，如有覆盖样式需要仔细检查。</p></li><li><p>横向滚动交互变化，<code>onPrevClick</code> 和 <code>onNextClick</code> 不再工作。</p></li></ul></li><li><p>less 变量变化，如 DatePicker/TimePicker/Calendar 相关变量已全部重构，又如 <a href="https://github.com/ant-design/ant-design/issues/28141">@btn-padding-base</a> 等进行了重命名，具体变化请自行对比 <a href="https://github.com/ant-design/ant-design/blob/3.x-stable/components/style/themes/default.less">3.x 变量</a> 和 <a href="https://github.com/ant-design/ant-design/blob/4.x-stable/components/style/themes/default.less">4.x 变量</a>。</p></li></ul><pre class="language-diff"><code><span class="token deleted">&lt;Table</span>
+  columns={[
+    {
+      title: 'Age',
+<span class="token deleted">-     dataIndex: 'user.age',</span>
+<span class="token inserted">+     dataIndex: ['user', 'age'],</span>
+    },
+  ]}
+/></code></pre><h2 id="开始升级"><span>开始升级</span><a href="#开始升级" class="anchor">#</a></h2><p>你可以手动对照上面的列表逐条检查代码进行修改，另外，我们也提供了一个 codemod cli 工具 <a href="https://github.com/ant-design/codemod-v4">@ant-design/codemod-v4</a> 以帮助你快速升级到 v4 版本。</p><p>在运行 codemod cli 前，请先提交你的本地代码修改。</p><pre class="language-shell"><code># 通过 npx 直接运行
+npx <span class="token operator">-</span>p <span class="token variable">@ant</span><span class="token operator">-</span>design<span class="token operator">/</span>codemod<span class="token operator">-</span>v4 antd4<span class="token operator">-</span>codemod src
+
+# 或者全局安装
+# 使用 npm
+npm i <span class="token operator">-</span>g <span class="token variable">@ant</span><span class="token operator">-</span>design<span class="token operator">/</span>codemod<span class="token operator">-</span>v4
+# 或者使用 yarn
+yarn <span class="token keyword">global</span> add <span class="token variable">@ant</span><span class="token operator">-</span>design<span class="token operator">/</span>codemod<span class="token operator">-</span>v4
+
+# 运行
+antd4<span class="token operator">-</span>codemod src</code></pre><p><img src="https://gw.alipayobjects.com/mdn/rms_08e378/afts/img/A*QdcbQoLC-cQAAAAAAAAAAABkARQnAQ" alt="codemod running" width="720"/></p><p>对于无法自动修改的部分，codemod 会在命令行进行提示，建议按提示手动修改。修改后可以反复运行上述命令进行检查。</p><p><img src="https://gw.alipayobjects.com/mdn/rms_08e378/afts/img/A*KQwWSrPirlUAAAAAAAAAAABkARQnAQ" alt="contains an invalid icon" width="720"/></p><blockquote><p>注意 codemod 不能涵盖所有场景，建议还是要按不兼容的变化逐条排查。</p></blockquote><h3 id="迁移工具修改详情"><span>迁移工具修改详情</span><a href="#迁移工具修改详情" class="anchor">#</a></h3><p><code>@ant-design/codemod-v4</code> 会帮你迁移到 antd v4, 废弃的组件则通过 <code>@ant-design/compatible</code> 保持运行, 一般来说你无需手动迁移。下方内容详细介绍了整体的迁移和变化，你也可以参照变动手动修改。</p><h4 id="安装兼容包"><span>安装兼容包</span><a href="#安装兼容包" class="anchor">#</a></h4><p>安装 <code>@ant-design/compatible</code> 通过指定 <code>v4-compatible-v3</code> tag 确认为 v4 兼容 v3 版本：</p><pre class="language-bash"><code><span class="token function">npm</span> <span class="token function">install</span> --save @ant-design/compatible@v4-compatible-v3</code></pre><h4 id="将已废弃的-Form-和-Mention-组件通过-@ant-design/compatible-包引入"><span>将已废弃的 <code>Form</code> 和 <code>Mention</code> 组件通过 <code>@ant-design/compatible</code> 包引入</span><a href="#将已废弃的-Form-和-Mention-组件通过-@ant-design/compatible-包引入" class="anchor">#</a></h4><pre class="language-diff"><code><span class="token deleted">- import { Form, Input, Button, Mention } from 'antd';</span>
+<span class="token inserted">+ import { Form, Mention } from '@ant-design/compatible';</span>
+<span class="token inserted">+ import '@ant-design/compatible/assets/index.css';</span>
+<span class="token inserted">+ import { Input, Button } from 'antd';</span>
+
+  ReactDOM.render(
+    &lt;>
+      &lt;Form>
+        {getFieldDecorator('username')(&lt;Input />)}
+        &lt;Button>Submit&lt;/Button>
+      &lt;/Form>
+      &lt;Mention
+        style={{ width: '100%' }}
+        onChange={onChange}
+        defaultValue={toContentState('@afc163')}
+        defaultSuggestions={['afc163', 'benjycui']}
+        onSelect={onSelect}
+      />
+    &lt;/>
+  );</code></pre><blockquote><p><strong>注意：</strong>从 <code>@ant-design/compatible</code> 引入的老版本 Form 组件，样式类名会从 <code>.ant-form</code> 变成 <code>.ant-legacy-form</code>，如果你对其进行了样式覆盖，也需要相应修改。</p></blockquote><h4 id="用新的-@ant-design/icons-替换字符串类型的-icon-属性值"><span>用新的 <code>@ant-design/icons</code> 替换字符串类型的 <code>icon</code> 属性值</span><a href="#用新的-@ant-design/icons-替换字符串类型的-icon-属性值" class="anchor">#</a></h4><pre class="language-diff"><code>  import { Avatar, Button, Result } from 'antd';
+<span class="token inserted">+ import { QuestionOutlined, UserOutlined } from '@ant-design/icons';</span>
+
+  ReactDOM.render(
+    &lt;div>
+<span class="token deleted">-     &lt;Button type="primary" shape="circle" icon="search" /></span>
+<span class="token inserted">+     &lt;Button type="primary" shape="circle" icon={SearchOutlined} /></span>
+<span class="token deleted">-     &lt;Avatar shape="square" icon="user" /></span>
+<span class="token inserted">+     &lt;Avatar shape="square" icon={UserOutlined} /></span>
+      &lt;Result
+<span class="token deleted">-       icon="question"</span>
+<span class="token inserted">+       icon={&lt;QuestionOutlined />}</span>
+        title="Great, we have done all the operations!"
+        extra={&lt;Button type="primary">Next&lt;/Button>}
+      />
+    &lt;/div>,
+    mountNode,
+  );</code></pre><h4 id="将-v3-Icon-组件转换成-@ant-design/icons-中引入"><span>将 v3 Icon 组件转换成 <code>@ant-design/icons</code> 中引入</span><a href="#将-v3-Icon-组件转换成-@ant-design/icons-中引入" class="anchor">#</a></h4><pre class="language-diff"><code><span class="token deleted">- import { Icon, Input } from 'antd';</span>
+<span class="token inserted">+ import { Input } from 'antd';</span>
+<span class="token inserted">+ import Icon, { CodeFilled, SmileOutlined, SmileTwoTone } from '@ant-design/icons';</span>
+
+  const HeartSvg = () => (
+    &lt;svg width="1em" height="1em" fill="currentColor" viewBox="0 0 1024 1024">
+      &lt;path d="M923 plapla..." />
+    &lt;/svg>
+  );
+
+  const HeartIcon = props => &lt;Icon component={HeartSvg} {...props} />;
+
+  ReactDOM.render(
+    &lt;div>
+<span class="token deleted">-     &lt;Icon type="code" theme="filled" /></span>
+<span class="token inserted">+     &lt;CodeFilled /></span>
+<span class="token deleted">-     &lt;Icon type="smile" theme="twoTone" twoToneColor="#eb2f96" /></span>
+<span class="token inserted">+     &lt;SmileTwoTone twoToneColor="#eb2f96" /></span>
+<span class="token deleted">-     &lt;Icon type="code" theme={props.fill ? 'filled' : 'outlined'} /></span>
+<span class="token inserted">+     &lt;LegacyIcon type="code" theme={props.fill ? 'filled' : 'outlined'} /></span>
+      &lt;HeartIcon />
+      &lt;Icon viewBox="0 0 24 24">
+        &lt;title>Cool Home&lt;/title>
+        &lt;path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+      &lt;/Icon>
+      &lt;Input suffix={&lt;SmileOutlined />} />
+    &lt;/div>,
+    mountNode,
+  );</code></pre><h4 id="将-v3-LocaleProvider-组件转换成-v4-ConfigProvider-组件"><span>将 v3 LocaleProvider 组件转换成 v4 ConfigProvider 组件</span><a href="#将-v3-LocaleProvider-组件转换成-v4-ConfigProvider-组件" class="anchor">#</a></h4><pre class="language-diff"><code><span class="token deleted">- import { LocaleProvider } from 'antd';</span>
+<span class="token inserted">+ import { ConfigProvider } from 'antd';</span>
+
+  ReactDOM.render(
+<span class="token deleted">-   &lt;LocaleProvider {...yourConfig}></span>
+<span class="token inserted">+   &lt;ConfigProvider {...yourConfig}></span>
+      &lt;Main />
+<span class="token deleted">-   &lt;/LocaleProvider></span>
+<span class="token inserted">+   &lt;/ConfigProvider></span>
+    mountNode,
+  );</code></pre><h4 id="将-Modal.method()-中字符串-icon-属性的调用转换成从-@ant-design/icons-中引入"><span>将 <code>Modal.method()</code> 中字符串 icon 属性的调用转换成从 <code>@ant-design/icons</code> 中引入</span><a href="#将-Modal.method()-中字符串-icon-属性的调用转换成从-@ant-design/icons-中引入" class="anchor">#</a></h4><pre class="language-diff"><code>  import { Modal } from 'antd';
+<span class="token inserted">+ import { AntDesignOutlined } from '@ant-design/icons';</span>
+
+  Modal.confirm({
+<span class="token deleted">-  icon: 'ant-design',</span>
+<span class="token inserted">+  icon: &lt;AntDesignOutlined />,</span>
+   title: 'Do you Want to delete these items?',
+   content: 'Some descriptions',
+   onOk() {
+     console.log('OK');
+   },
+   onCancel() {
+     console.log('Cancel');
+   },
+ });</code></pre><h2 id="遇到问题"><span>遇到问题</span><a href="#遇到问题" class="anchor">#</a></h2><p>v4 做了非常多的细节改进和重构，我们尽可能收集了已知的所有不兼容变化和相关影响，但是有可能还是有一些场景我们没有考虑到。如果你在升级过程中遇到了问题，请到 <a href="http://new-issue.ant.design/">GitHub issues</a> 和 <a href="https://github.com/ant-design/codemod-v4/issues">codemod Issues</a> 进行反馈。我们会尽快响应和相应改进这篇文档。</p></section><section class="markdown api-container"></section></article><div class="contributors-list" style="display:flex;list-style:none;margin:0;padding:0"><span style="opacity:0.3" class="ant-avatar ant-avatar-circle"><span class="ant-avatar-string" style="opacity:0"></span></span></div></section><section class="prev-next-nav"><a class="prev-page" href="/docs/react/replace-moment-cn"><span role="img" aria-label="left" class="anticon anticon-left footer-nav-icon-before"><svg viewBox="64 64 896 896" focusable="false" data-icon="left" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 000 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path></svg></span>替换 Moment.js<span role="img" aria-label="right" class="anticon anticon-right footer-nav-icon-after"><svg viewBox="64 64 896 896" focusable="false" data-icon="right" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 00302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 000-50.4z"></path></svg></span></a><a class="next-page" href="/docs/react/recommendation-cn"><span role="img" aria-label="left" class="anticon anticon-left footer-nav-icon-before"><svg viewBox="64 64 896 896" focusable="false" data-icon="left" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 000 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path></svg></span>社区精选组件<span role="img" aria-label="right" class="anticon anticon-right footer-nav-icon-after"><svg viewBox="64 64 896 896" focusable="false" data-icon="right" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 00302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 000-50.4z"></path></svg></span></a></section></div></div></div></div>
+    
+    <script src="/anticon~83be3271.edb224.js"></script>
+    
+    <script src="/anticon~2c1e1bc1.bbd8bd.js"></script>
+    
+    <script src="/anticon~aff8b51d.90a887.js"></script>
+    
+    <script src="/anticon~b39e3fdb.f6e8fc.js"></script>
+    
+    <script src="/anticon~ee4fcf7a.d3f72d.js"></script>
+    
+    <script src="/anticon~e0710ea3.aa4333.js"></script>
+    
+    <script src="/components.c97666.js"></script>
+    
+    <script src="/index-372f28a1.js"></script>
+    
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-72788897-1"></script>
+    <script>
+      if (!location.port) {
+        // Enable Google Analytics
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+          dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'UA-72788897-1');
+      }
+    </script>
+    <!-- Hotjar Tracking Code for ant.design -->
+    <script>
+      (function (h, o, t, j, a, r) {
+        if (location.hostname === 'localhost') {
+          return;
+        }
+
+        h.hj =
+          h.hj ||
+          function () {
+            (h.hj.q = h.hj.q || []).push(arguments);
+          };
+        h._hjSettings = { hjid: 473408, hjsv: 5 };
+        a = o.getElementsByTagName('head')[0];
+        r = o.createElement('script');
+        r.async = 1;
+        r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
+        a.appendChild(r);
+      })(window, document, '//static.hotjar.com/c/hotjar-', '.js?sv=');
+    </script>
+
+    <!--
+      感谢每位为开源理想而奋斗的人们，愿你们在人生新的旅途一帆风顺！~
+      https://gw.alipayobjects.com/mdn/rms_08e378/afts/img/A*_7M0S7zdFBcAAAAAAAAAAAAAARQnAQ
+
+      2021.05.21
+    -->
+  </body>
+</html>

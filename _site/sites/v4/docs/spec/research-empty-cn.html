@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh" data-direction="ltr" class="">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1890ff" />
+    <title>空状态 - Ant Design</title>
+    <meta data-rh="true" property="og:type" content="website"/><meta data-rh="true" property="og:image" content="https://gw.alipayobjects.com/zos/rmsportal/rlpTLlbMzTNYuZGGCVYM.png"/><meta data-rh="true" property="og:title" content="空状态 - Ant Design"/><meta data-rh="true" name="description" content="任何内容区域（页面、区块、组件、单数据）没有内容/数据显示给用户时，就会出现空状态。"/>
+    <link
+      rel="icon"
+      href="https://gw.alipayobjects.com/zos/rmsportal/rlpTLlbMzTNYuZGGCVYM.png"
+      type="image/x-icon"
+    />
+    
+    <link rel="stylesheet" type="text/css" href="/index-4fcbaf0b.css" />
+    
+    <style id="nprogress-style">
+      #nprogress {
+        display: none;
+      }
+    </style>
+    <link rel="stylesheet/less" type="text/css" href="/color.less" />
+    <script src="https://b.alicdn.com/s/polyfill.min.js?features=default,es2015,Intl"></script>
+    <link id="darkThemeLink" rel="stylesheet" href="/dark.css" />
+    <script>
+      /* 设置 meta theme-color 的值，默认会设置一个 #1890ff   */
+      function setColor(isDarken) {
+        try {
+          var theme = document.getElementsByTagName('meta')['theme-color'];
+          theme.setAttribute('content', isDarken ? 'rgba(0,0,0,0.65)' : '#1890ff');
+        } catch (error) {}
+      }
+      /* -------------------------- 主题相关 -------------------------- */
+      (function () {
+        /* 获取查询参数对象 */
+        function getSearchParam(search) {
+          // 处理入参错误
+          var search = search || location.search;
+          if (search === undefined) {
+            return;
+          }
+
+          var pattern = /(\w+)=(\w+)/gi; // 定义正则
+          var matches = search.match(pattern);
+          if (!matches) {
+            return;
+          }
+
+          function fromEntries(iterable) {
+            return iterable.reduce(function (obj, keyvalue) {
+              var key = keyvalue[0];
+              var val = keyvalue[1];
+              obj[key] = val;
+              return obj;
+            }, {});
+          }
+
+          var searchParam = fromEntries(
+            matches.map(function (item) {
+              return item.split('=');
+            }),
+          );
+          return searchParam;
+        }
+
+        var searchParam = getSearchParam(location.search) || {}; // 查询参数对象
+
+        var isDarkMode = searchParam.theme === 'dark'; // 判断当前主题
+        var isComponentsPage = location.pathname.indexOf('/components') === 0; // 判断是否组件页面
+
+        // 1. 暗色主题刷新时无白屏
+        // 如果是暗色主题，且在components路由下
+        var darkThemeLinkEl = document.getElementById('darkThemeLink');
+        if (isDarkMode && isComponentsPage) {
+          // 将预先定义的暗色主题link移动到body内
+          document.addEventListener(
+            'readystatechange',
+            function () {
+              document.head.appendChild(styleElement);
+            },
+            { once: true },
+          );
+          // load后卸载
+          window.addEventListener(
+            'load',
+            function () {
+              darkThemeLinkEl.parentNode.removeChild(darkThemeLinkEl);
+            },
+            { once: true },
+          );
+          setColor(true);
+          // 清除dark.css中的全部transition 待解析完后恢复
+          var styleElement = document.createElement('style');
+          styleElement.type = 'text/css';
+          styleElement.innerHTML =
+            '* {transition: none !important;} html {background: rgb(20, 20, 20)}';
+          document.head.appendChild(styleElement);
+          document.documentElement.style.backgroundColor = 'black';
+          window.addEventListener(
+            'load',
+            function () {
+              styleElement.parentNode.removeChild(styleElement);
+            },
+            { once: true },
+          );
+
+          // 设置系统主题
+          document.documentElement.style.colorScheme = 'dark';
+        } else {
+          setColor(false);
+          document.documentElement.style.colorScheme = 'light';
+          darkThemeLinkEl.parentNode.removeChild(darkThemeLinkEl);
+        }
+      })();
+    </script>
+    <script>
+      (function () {
+        function isLocalStorageNameSupported() {
+          var testKey = 'test';
+          var storage = window.localStorage;
+          try {
+            storage.setItem(testKey, '1');
+            storage.removeItem(testKey);
+            return true;
+          } catch (error) {
+            return false;
+          }
+        }
+        // 优先级提高到所有静态资源的前面，语言不对，加载其他静态资源没意义
+        var pathname = location.pathname;
+
+        function isZhCN(pathname) {
+          return /-cn\/?$/.test(pathname);
+        }
+        function getLocalizedPathname(path, zhCN) {
+          var pathname = path.indexOf('/') === 0 ? path : '/' + path;
+          if (!zhCN) {
+            // to enUS
+            return /\/?index-cn/.test(pathname) ? '/' : pathname.replace('-cn', '');
+          } else if (pathname === '/') {
+            return '/index-cn';
+          } else if (pathname.indexOf('/') === pathname.length - 1) {
+            return pathname.replace(/\/$/, '-cn/');
+          }
+          return pathname + '-cn';
+        }
+
+        // 兼容旧的 URL， `?locale=...`
+        var queryString = location.search;
+        if (queryString) {
+          var isZhCNConfig = queryString.indexOf('zh-CN') > -1;
+          if (isZhCNConfig && !isZhCN(pathname)) {
+            location.pathname = getLocalizedPathname(pathname, isZhCNConfig);
+          }
+        }
+
+        // 首页无视链接里面的语言设置 https://github.com/ant-design/ant-design/issues/4552
+        if (isLocalStorageNameSupported() && (pathname === '/' || pathname === '/index-cn')) {
+          var lang =
+            (window.localStorage && localStorage.getItem('locale')) ||
+            ((navigator.language || navigator.browserLanguage).toLowerCase() === 'zh-cn'
+              ? 'zh-CN'
+              : 'en-US');
+          // safari is 'zh-cn', while other browser is 'zh-CN';
+          if ((lang === 'zh-CN') !== isZhCN(pathname)) {
+            location.pathname = getLocalizedPathname(pathname, lang === 'zh-CN');
+          }
+        }
+        document.documentElement.className += isZhCN(pathname) ? 'zh-cn' : 'en-us';
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="react-content"><header id="header" class="clearfix"><div class="ant-row" style="flex-flow:nowrap;height:64px"><div class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-6 ant-col-lg-6 ant-col-xl-5 ant-col-xxl-4"><h1><a id="logo" href="/index-cn"><img alt="logo" src="https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg"/>Ant Design</a></h1></div><div class="ant-col menu-row ant-col-xs-0 ant-col-sm-0 ant-col-md-18 ant-col-lg-18 ant-col-xl-19 ant-col-xxl-20"><div id="search-box" class=""><span class="ant-input-affix-wrapper"><span class="ant-input-prefix"><span role="img" aria-label="search" class="anticon anticon-search"><svg viewBox="64 64 896 896" focusable="false" data-icon="search" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6a8.2 8.2 0 0011.6 0l43.6-43.5a8.2 8.2 0 000-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.2 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z"></path></svg></span></span><input type="text" placeholder="搜索" value="" class="ant-input"/></span></div><ul class="ant-menu ant-menu-root ant-menu-horizontal ant-menu-light menu-site" id="nav" dir="ltr" role="menu" tabindex="0" data-menu-list="true"><li class="ant-menu-item ant-menu-item-selected ant-menu-item-only-child" role="menuitem" tabindex="-1" data-menu-id="nav-docs/spec"><span class="ant-menu-title-content"><a href="/docs/spec/introduce-cn">设计</a></span></li><li class="ant-menu-item ant-menu-item-only-child" role="menuitem" tabindex="-1" data-menu-id="nav-docs/react"><span class="ant-menu-title-content"><a href="/docs/react/introduce-cn">文档</a></span></li><li class="ant-menu-item ant-menu-item-only-child" role="menuitem" tabindex="-1" data-menu-id="nav-components"><span class="ant-menu-title-content"><a href="/components/overview-cn/">组件</a></span></li></ul><div style="display:none" aria-hidden="true"></div><button type="button" class="ant-btn ant-btn-default ant-btn-sm header-button header-lang-button">English</button><button type="button" class="ant-btn ant-btn-default ant-btn-sm header-button header-direction-button"><span>RTL</span></button></div></div></header><div class="main-wrapper"><div class="ant-row"><div class="ant-col main-menu ant-col-xs-24 ant-col-sm-24 ant-col-md-6 ant-col-lg-6 ant-col-xl-5 ant-col-xxl-4"><div><div class=""><section class="main-menu-inner"><ul class="ant-menu ant-menu-root ant-menu-inline ant-menu-light aside-container menu-site" dir="ltr" role="menu" tabindex="0" data-menu-list="true"><li class="ant-menu-submenu ant-menu-submenu-inline ant-menu-submenu-open" role="none"><div role="menuitem" style="padding-left:30px" class="ant-menu-submenu-title" tabindex="-1" aria-expanded="true" aria-haspopup="true"><span class="ant-menu-title-content">Ant Design</span><i class="ant-menu-submenu-arrow"></i></div><ul class="ant-menu ant-menu-sub ant-menu-inline" role="menu" data-menu-list="true"><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/introduce-cn"><span>介绍</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/values-cn"><span>设计价值观</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/cases-cn"><span>实践案例</span><span class="chinese"></span></a></span></li></ul></li><li class="ant-menu-submenu ant-menu-submenu-inline ant-menu-submenu-open" role="none"><div role="menuitem" style="padding-left:30px" class="ant-menu-submenu-title" tabindex="-1" aria-expanded="true" aria-haspopup="true"><span class="ant-menu-title-content">全局样式</span><i class="ant-menu-submenu-arrow"></i></div><ul class="ant-menu ant-menu-sub ant-menu-inline" role="menu" data-menu-list="true"><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/colors-cn"><span>色彩</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/layout-cn"><span>布局</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/font-cn"><span>字体</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/icon-cn"><span>图标</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/shadow-cn"><span>阴影</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/dark-cn"><span>暗黑模式</span><span class="chinese"></span></a></span></li></ul></li><li class="ant-menu-submenu ant-menu-submenu-inline ant-menu-submenu-open" role="none"><div role="menuitem" style="padding-left:30px" class="ant-menu-submenu-title" tabindex="-1" aria-expanded="true" aria-haspopup="true"><span class="ant-menu-title-content">设计模式</span><i class="ant-menu-submenu-arrow"></i></div><ul class="ant-menu ant-menu-sub ant-menu-inline" role="menu" data-menu-list="true"><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/overview-cn"><span>概览</span><span class="chinese"></span></a></span></li><li role="presentation" class="ant-menu-item-group"><div role="presentation" class="ant-menu-item-group-title" title="原则">原则</div><ul role="group" class="ant-menu-item-group-list"><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/proximity-cn"><span>亲密性</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/alignment-cn"><span>对齐</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/contrast-cn"><span>对比</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/repetition-cn"><span>重复</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/direct-cn"><span>直截了当</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/stay-cn"><span>足不出户</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/lightweight-cn"><span>简化交互</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/invitation-cn"><span>提供邀请</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/transition-cn"><span>巧用过渡</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/reaction-cn"><span>即时反应</span><span class="chinese"></span></a></span></li></ul></li><li role="presentation" class="ant-menu-item-group"><div role="presentation" class="ant-menu-item-group-title" title="全局规则">全局规则</div><ul role="group" class="ant-menu-item-group-list"><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/data-entry-cn"><span>数据录入</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/data-display-cn"><span>数据展示</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/data-format-cn"><span>数据格式</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/copywriting-cn"><span>文案</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/buttons-cn"><span>按钮</span><span class="chinese"></span></a></span></li></ul></li><li role="presentation" class="ant-menu-item-group"><div role="presentation" class="ant-menu-item-group-title" title="模板文档">模板文档</div><ul role="group" class="ant-menu-item-group-list"><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/visualization-page-cn"><span>数据可视化页</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/detail-page-cn"><span>详情页</span><span class="chinese"></span></a></span></li></ul></li></ul></li><li class="ant-menu-submenu ant-menu-submenu-inline ant-menu-submenu-open" role="none"><div role="menuitem" style="padding-left:30px" class="ant-menu-submenu-title" tabindex="-1" aria-expanded="true" aria-haspopup="true"><span class="ant-menu-title-content">设计模式 - 探索</span><i class="ant-menu-submenu-arrow"></i></div><ul class="ant-menu ant-menu-sub ant-menu-inline" role="menu" data-menu-list="true"><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/research-overview-cn"><span>概览</span><span class="chinese"></span></a></span></li><li role="presentation" class="ant-menu-item-group"><div role="presentation" class="ant-menu-item-group-title" title="全局规则">全局规则</div><ul role="group" class="ant-menu-item-group-list"><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/research-navigation-cn"><span>导航</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/research-message-and-feedback-cn"><span>消息与反馈</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-selected ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/research-empty-cn"><span>空状态</span><span class="chinese"></span></a></span></li></ul></li><li role="presentation" class="ant-menu-item-group"><div role="presentation" class="ant-menu-item-group-title" title="模板文档">模板文档</div><ul role="group" class="ant-menu-item-group-list"><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/research-form-cn"><span>表单页</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/research-workbench-cn"><span>工作台</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/research-list-cn"><span>列表页</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/research-result-cn"><span>结果页</span><span class="chinese"></span></a></span></li><li role="menuitem" tabindex="-1" style="padding-left:60px" class="ant-menu-item ant-menu-item-only-child"><span class="ant-menu-title-content"><a href="/docs/spec/research-exception-cn"><span>异常页</span><span class="chinese"></span></a></span></li></ul></li></ul></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/spec/visual-cn">可视化</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/spec/motion-cn">动效</a></span></li><li class="ant-menu-item ant-menu-item-only-child" style="padding-left:30px" role="menuitem" tabindex="-1"><span class="ant-menu-title-content"><a href="/docs/spec/illustration-cn">图形化</a></span></li></ul><div style="display:none" aria-hidden="true"></div></section></div></div></div><div class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-18 ant-col-lg-18 ant-col-xl-19 ant-col-xxl-20"><section class="main-container"><article class="markdown"><div><h1>空状态<a class="edit-button" href="https://github.com/ant-design/ant-design/edit/master/docs/spec/research-empty.zh-CN.md" target="_blank" rel="noopener noreferrer"><span role="img" aria-label="edit" class="anticon anticon-edit"><svg viewBox="64 64 896 896" focusable="false" data-icon="edit" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 000-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 009.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3-362.7 362.6-88.9 15.7 15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z"></path></svg></span></a></h1><section class="markdown"><p>任何内容区域（页面、区块、组件、单数据）没有内容/数据显示给用户时，就会出现空状态。</p><h2 id="设计目标"><span>设计目标</span><a href="#设计目标" class="anchor">#</a></h2><ul><li><p>空状态应给予提示，帮助让用户了解空状态原因，避免产生误解与迷失；</p></li><li><p>给予用户推荐操作提示，帮助用户摆脱空状态。</p></li></ul></section></div><div class="toc-affix"><div class=""><ul class="toc"><li><a class="bisheng-toc-h2" href="#设计原则" title="设计原则">设计原则</a></li><li><a class="bisheng-toc-h2" href="#使用场景" title="使用场景">使用场景</a></li><li><a class="bisheng-toc-h2" href="#扩展阅读" title="扩展阅读">扩展阅读</a></li></ul></div></div><section class="markdown"><h2 id="设计原则"><span>设计原则</span><a href="#设计原则" class="anchor">#</a></h2><div class="design-inline-cards"><div><img src="https://gw.alipayobjects.com/mdn/rms_08e378/afts/img/A*q5MRQ6TBR0EAAAAAAAAAAABkARQnAQ"/><div><h4 id="明确"><span>明确</span><a href="#明确" class="anchor">#</a></h4><p>通过使用清晰明了的语言、插画等形式告知用户空状态的具体原因。</p></div></div><div><img src="https://gw.alipayobjects.com/mdn/rms_08e378/afts/img/A*wOoaT6juZqwAAAAAAAAAAABkARQnAQ"/><div><h4 id="提供邀请"><span>提供邀请</span><a href="#提供邀请" class="anchor">#</a></h4><p>提供帮助文案、建议操作等解决方案，表明在下一个界面可以做什么，引导用户进行操作。</p></div></div></div><h3 id="Do&amp;Don’t"><span>Do&amp;Don’t</span><a href="#Do&amp;Don’t" class="anchor">#</a></h3><div class="preview-image-boxes clearfix preview-image-boxes-compare"><div class="preview-image-box" style="width:50.000%"><div class="preview-image-wrapper good"><img class="preview-img no-padding good" src="https://gw.alipayobjects.com/mdn/rms_08e378/afts/img/A*Bh_yRKPOByUAAAAAAAAAAABkARQnAQ" alt="正确示范"/></div><div class="preview-image-title">正确示范</div><div class="preview-image-description">展示明确空状态提示。</div></div><div class="preview-image-box" style="width:50.000%"><div class="preview-image-wrapper bad"><img class="preview-img no-padding bad" src="https://gw.alipayobjects.com/mdn/rms_08e378/afts/img/A*yiIXR4u8s2wAAAAAAAAAAABkARQnAQ" alt="错误示范"/></div><div class="preview-image-title">错误示范</div><div class="preview-image-description">空状态没有任何提示。</div></div></div><hr/><h2 id="使用场景"><span>使用场景</span><a href="#使用场景" class="anchor">#</a></h2><h3 id="新手引导"><span>新手引导</span><a href="#新手引导" class="anchor">#</a></h3><div class="preview-image-boxes clearfix"><div class="preview-image-box"><div class="preview-image-wrapper"><img class="preview-img no-padding" src="https://gw.alipayobjects.com/mdn/rms_08e378/afts/img/A*UyVCTaiJ3icAAAAAAAAAAABkARQnAQ"/></div><div class="preview-image-title"></div><div class="preview-image-description"></div></div></div><p>一般来说，新用户希望空状态具有帮助说明和推荐操作。首次使用应用或功能场景的空状态非常有用，因为它向用户展示了该功能和流程，并且可以帮助用户快速上手。为了帮助首次使用新用户，空状态可以使用功能引导、帮助文档等方式填充原本为空的页面。</p><h4 id="使用引导变形"><span>使用引导变形</span><a href="#使用引导变形" class="anchor">#</a></h4><div class="preview-image-boxes clearfix"><div class="preview-image-box"><div class="preview-image-wrapper"><img class="preview-img no-padding" src="https://gw.alipayobjects.com/mdn/rms_08e378/afts/img/A*Pf8HSa477DQAAAAAAAAAAABkARQnAQ"/></div><div class="preview-image-title"></div><div class="preview-image-description"></div></div></div><p>使用引导由状态提示、帮助引导、建议操作三个部分组成，设计时可根据业务流程选择模块来构成页面和变形。针对处于复杂流程中某一环的空状态页面，也可提供流程引导模块帮助用户全局理解操作流程，同时可提供文字按钮进行流程相关的快捷操作。</p><h3 id="完成或清空"><span>完成或清空</span><a href="#完成或清空" class="anchor">#</a></h3><div class="preview-image-boxes clearfix"><div class="preview-image-box"><div class="preview-image-wrapper"><img class="preview-img no-padding" src="https://gw.alipayobjects.com/mdn/rms_08e378/afts/img/A*SIZBTJs3O4kAAAAAAAAAAABkARQnAQ"/></div><div class="preview-image-title"></div><div class="preview-image-description"></div></div></div><p>这种空状态是用户自愿从功能上删除数据的情况。例如，客户完成了任务清单上的所有项目，阅读了所有通知。一般此类场景不需要进行操作引导，只需要用图形元素或提示信息进行空状态说明。</p><h3 id="无数据"><span>无数据</span><a href="#无数据" class="anchor">#</a></h3><div class="preview-image-boxes clearfix"><div class="preview-image-box"><div class="preview-image-wrapper"><img class="preview-img no-padding" src="https://gw.alipayobjects.com/mdn/rms_08e378/afts/img/A*utf3Qr-9VssAAAAAAAAAAABkARQnAQ"/></div><div class="preview-image-title"></div><div class="preview-image-description"></div></div></div><p>内容区域无数据的场景使用，由图形元素、提示信息、建议操作三类元素组合展示，根据使用场景决定是否提供建议操作。</p><hr/><h2 id="扩展阅读"><span>扩展阅读</span><a href="#扩展阅读" class="anchor">#</a></h2><h3 id="外部参考文章"><span>外部参考文章</span><a href="#外部参考文章" class="anchor">#</a></h3><ul><li><p><a href="https://www.lightningdesignsystem.com/guidelines/empty-state/#Message">Salesforce 空状态设计准则</a></p></li><li><p><a href="https://www.predix-ui.com/#/design/communication/empty-states">PREDIX 空状态设计准则</a></p></li><li><p><a href="https://material.io/design/communication/empty-states.html#content">Material Design 空状态设计准则</a></p></li></ul></section><section class="markdown api-container"></section></article><div class="contributors-list" style="display:flex;list-style:none;margin:0;padding:0"><span style="opacity:0.3" class="ant-avatar ant-avatar-circle"><span class="ant-avatar-string" style="opacity:0"></span></span></div></section><section class="prev-next-nav"><a class="prev-page" href="/docs/spec/research-message-and-feedback-cn"><span role="img" aria-label="left" class="anticon anticon-left footer-nav-icon-before"><svg viewBox="64 64 896 896" focusable="false" data-icon="left" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 000 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path></svg></span><span>消息与反馈</span><span class="chinese"></span><span role="img" aria-label="right" class="anticon anticon-right footer-nav-icon-after"><svg viewBox="64 64 896 896" focusable="false" data-icon="right" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 00302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 000-50.4z"></path></svg></span></a><a class="next-page" href="/docs/spec/research-form-cn"><span role="img" aria-label="left" class="anticon anticon-left footer-nav-icon-before"><svg viewBox="64 64 896 896" focusable="false" data-icon="left" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 000 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path></svg></span><span>表单页</span><span class="chinese"></span><span role="img" aria-label="right" class="anticon anticon-right footer-nav-icon-after"><svg viewBox="64 64 896 896" focusable="false" data-icon="right" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 00302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 000-50.4z"></path></svg></span></a></section></div></div></div></div>
+    
+    <script src="/anticon~83be3271.edb224.js"></script>
+    
+    <script src="/anticon~2c1e1bc1.bbd8bd.js"></script>
+    
+    <script src="/anticon~aff8b51d.90a887.js"></script>
+    
+    <script src="/anticon~b39e3fdb.f6e8fc.js"></script>
+    
+    <script src="/anticon~ee4fcf7a.d3f72d.js"></script>
+    
+    <script src="/anticon~e0710ea3.aa4333.js"></script>
+    
+    <script src="/components.c97666.js"></script>
+    
+    <script src="/index-372f28a1.js"></script>
+    
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-72788897-1"></script>
+    <script>
+      if (!location.port) {
+        // Enable Google Analytics
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+          dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'UA-72788897-1');
+      }
+    </script>
+    <!-- Hotjar Tracking Code for ant.design -->
+    <script>
+      (function (h, o, t, j, a, r) {
+        if (location.hostname === 'localhost') {
+          return;
+        }
+
+        h.hj =
+          h.hj ||
+          function () {
+            (h.hj.q = h.hj.q || []).push(arguments);
+          };
+        h._hjSettings = { hjid: 473408, hjsv: 5 };
+        a = o.getElementsByTagName('head')[0];
+        r = o.createElement('script');
+        r.async = 1;
+        r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
+        a.appendChild(r);
+      })(window, document, '//static.hotjar.com/c/hotjar-', '.js?sv=');
+    </script>
+
+    <!--
+      感谢每位为开源理想而奋斗的人们，愿你们在人生新的旅途一帆风顺！~
+      https://gw.alipayobjects.com/mdn/rms_08e378/afts/img/A*_7M0S7zdFBcAAAAAAAAAAAAAARQnAQ
+
+      2021.05.21
+    -->
+  </body>
+</html>
