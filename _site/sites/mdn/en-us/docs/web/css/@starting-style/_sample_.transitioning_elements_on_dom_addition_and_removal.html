@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="robots" content="noindex, nofollow">
+        <style>
+            body {
+              padding: 0;
+              margin: 0;
+            }
+
+            svg:not(:root) {
+              display: block;
+            }
+
+            .playable-code {
+              background-color: #f4f7f8;
+              border: none;
+              border-left: 6px solid #558abb;
+              border-width: medium medium medium 6px;
+              color: #4d4e53;
+              height: 100px;
+              width: 90%;
+              padding: 10px 10px 0;
+            }
+
+            .playable-canvas {
+              border: 1px solid #4d4e53;
+              border-radius: 2px;
+            }
+
+            .playable-buttons {
+              text-align: right;
+              width: 90%;
+              padding: 5px 10px 5px 26px;
+            }
+        </style>
+        
+        <style>
+            html * {
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  gap: 10px;
+}
+
+body > button {
+  margin: 10px 10px 0 10px;
+}
+
+section {
+  display: flex;
+  flex: 1;
+  gap: 10px;
+  margin: 10px;
+}
+
+div {
+  flex: 1;
+  border: 1px solid gray;
+  position: relative;
+  background: linear-gradient(
+    to right,
+    rgb(255 255 255 / 0),
+    rgb(255 255 255 / 0.5)
+  );
+  opacity: 1;
+  scale: 1 1;
+
+  transition:
+    opacity 0.7s,
+    scale 0.7s,
+    display 0.7s allow-discrete;
+    all 0.7s allow-discrete
+  /* Equivalent to
+  transition: all 0.7s allow-discrete; */
+}
+
+/* Include after the `div` rule */
+@starting-style {
+  div {
+    opacity: 0;
+    scale: 1 0;
+  }
+}
+
+.fade-out {
+  opacity: 0;
+  display: none;
+  scale: 1 0;
+}
+
+div > button {
+  font-size: 1.6rem;
+  background: none;
+  border: 0;
+  text-shadow: 2px 1px 1px white;
+  border-radius: 15px;
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  cursor: pointer;
+}
+
+        </style>
+        
+        <title>@starting-style - transitioning_elements_on_dom_addition_and_removal - code sample</title>
+        
+    </head>
+    <body>
+        
+            <button>Create new column</button>
+<section></section>
+
+        
+        
+            <script>
+                const btn = document.querySelector("button");
+const sectionElem = document.querySelector("section");
+
+btn.addEventListener("click", createColumn);
+
+function randomColor() {
+  function randomNum() {
+    return Math.floor(Math.random() * 255);
+  }
+
+  return `rgb(${randomNum()} ${randomNum()} ${randomNum()})`;
+}
+
+function createColumn() {
+  const divElem = document.createElement("div");
+  divElem.style.backgroundColor = randomColor();
+
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "✖";
+  closeBtn.setAttribute("aria-label", "close");
+  divElem.append(closeBtn);
+  sectionElem.append(divElem);
+
+  closeBtn.addEventListener("click", () => {
+    divElem.classList.add("fade-out");
+
+    setTimeout(() => {
+      divElem.remove();
+    }, 1000);
+  });
+}
+
+            </script>
+        
+    </body>
+</html>

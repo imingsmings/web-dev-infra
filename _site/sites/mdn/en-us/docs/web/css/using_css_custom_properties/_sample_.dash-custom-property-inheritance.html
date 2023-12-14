@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="robots" content="noindex, nofollow">
+        <style>
+            body {
+              padding: 0;
+              margin: 0;
+            }
+
+            svg:not(:root) {
+              display: block;
+            }
+
+            .playable-code {
+              background-color: #f4f7f8;
+              border: none;
+              border-left: 6px solid #558abb;
+              border-width: medium medium medium 6px;
+              color: #4d4e53;
+              height: 100px;
+              width: 90%;
+              padding: 10px 10px 0;
+            }
+
+            .playable-canvas {
+              border: 1px solid #4d4e53;
+              border-radius: 2px;
+            }
+
+            .playable-buttons {
+              text-align: right;
+              width: 90%;
+              padding: 5px 10px 5px 26px;
+            }
+        </style>
+        
+        <style>
+            div {
+  color: black;
+  font-family: sans-serif;
+  width: 75%;
+  height: 80%;
+  margin: 4px;
+  border: 2px black solid;
+  display: inline-block;
+}
+
+p {
+  margin: 0;
+}
+
+.one {
+  height: 250px;
+}
+
+.two {
+  height: 80%;
+}
+
+.three {
+  height: 40%;
+}
+
+.four {
+  height: 40%;
+}
+
+div {
+  background-color: var(--box-color);
+}
+
+.two {
+  --box-color: cornflowerblue;
+}
+
+.three {
+  --box-color: aquamarine;
+}
+
+        </style>
+        
+        <title>Using CSS custom properties (variables) - dash-custom-property-inheritance - code sample</title>
+        
+    </head>
+    <body>
+        
+            <div class="one">
+  <p>One</p>
+  <div class="two">
+    <p>Two</p>
+    <div class="three"><p>Three</p></div>
+    <div class="four"><p>Four</p></div>
+  </div>
+</div>
+
+        
+        
+    </body>
+</html>
