@@ -1,0 +1,10 @@
+# Contributors by commit history
+https://github.com/mdn/content/commits/main/files/en-us/glossary/ril/index.md
+
+# Original Wiki contributors
+hbloomer
+klez
+Andrew_Pfeiffer
+Jeremie
+kscarfone
+chrisdavidmills

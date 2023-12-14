@@ -1,0 +1,7 @@
+# Contributors by commit history
+https://github.com/mdn/content/commits/main/files/en-us/glossary/style_origin/index.md
+
+# Original Wiki contributors
+RafeyIqbalRahman
+Iqbalh11
+Sheppy

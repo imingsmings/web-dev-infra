@@ -1,0 +1,9 @@
+# Contributors by commit history
+https://github.com/mdn/content/commits/main/files/en-us/glossary/gpl/index.md
+
+# Original Wiki contributors
+klez
+Aleksej
+Andrew_Pfeiffer
+jsx
+kscarfone

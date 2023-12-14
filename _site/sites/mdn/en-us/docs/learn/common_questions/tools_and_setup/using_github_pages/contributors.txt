@@ -1,0 +1,7 @@
+# Contributors by commit history
+https://github.com/mdn/content/commits/main/files/en-us/learn/common_questions/tools_and_setup/using_github_pages/index.md
+
+# Original Wiki contributors
+chrisdavidmills
+junBryl
+Mori

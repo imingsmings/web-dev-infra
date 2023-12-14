@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All in one web development reference</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+        .contianer{
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(30deg,#CBBACC,#2580B3);
+            animation: hueRotate 20s infinite alternate;
+        }
+        .contianer .item {
+            text-decoration: none;
+            flex: 1;
+            text-align: center;
+            color: #fff;
+            font-size: 1.2rem;
+        }
+
+        @keyframes hueRotate {
+            100% {
+                filter: hue-rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="contianer"></div>
+    <script id='tpl'>[{"title":"Ant Design V5","origin":"http://192.168.0.107:9001"},{"title":"Ant Design V4","origin":"http://192.168.0.107:9002"},{"title":"Ant Design V3","origin":"http://192.168.0.107:9003"},{"title":"Pro Components","origin":"http://192.168.0.107:9004"},{"title":"MDN Web Docs","origin":"http://192.168.0.107:9005"}]</script>
+    <script>
+        const hostAddress = `${location.protocol}//${location.hostname}`
+        const items = JSON.parse(document.querySelector('#tpl').textContent)
+
+        const init = () => {
+            setItems(items, appendConent)
+        }
+
+        init()
+
+        function setItems(items, append) {
+            const oFrag = document.createDocumentFragment()
+
+            items.forEach((item, index) => {
+                const oA = document.createElement('a')
+                oA.className = 'item'
+                oA.href = item.origin
+                oA.title = item.ttile
+                oA.target = '_blank'
+                oA.textContent = item.title
+
+                oFrag.appendChild(oA)
+            })
+
+            append(oFrag)
+        }
+
+        function appendConent (oFrag) {
+            const contianer = document.querySelector('.contianer')
+            contianer.appendChild(oFrag)
+        }
+    </script>
+</body>
+</html>

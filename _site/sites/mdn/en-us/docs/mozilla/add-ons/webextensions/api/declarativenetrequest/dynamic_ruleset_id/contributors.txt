@@ -1,0 +1,5 @@
+# Contributors by commit history
+https://github.com/mdn/content/commits/main/files/en-us/mozilla/add-ons/webextensions/api/declarativenetrequest/dynamic_ruleset_id/index.md
+
+# Original Wiki contributors
+
