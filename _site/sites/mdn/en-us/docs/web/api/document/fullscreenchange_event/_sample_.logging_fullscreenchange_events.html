@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="robots" content="noindex, nofollow">
+        <style>
+            body {
+              padding: 0;
+              margin: 0;
+            }
+
+            svg:not(:root) {
+              display: block;
+            }
+
+            .playable-code {
+              background-color: #f4f7f8;
+              border: none;
+              border-left: 6px solid #558abb;
+              border-width: medium medium medium 6px;
+              color: #4d4e53;
+              height: 100px;
+              width: 90%;
+              padding: 10px 10px 0;
+            }
+
+            .playable-canvas {
+              border: 1px solid #4d4e53;
+              border-radius: 2px;
+            }
+
+            .playable-buttons {
+              text-align: right;
+              width: 90%;
+              padding: 5px 10px 5px 26px;
+            }
+        </style>
+        
+        <style>
+            * {
+  box-sizing: border-box;
+}
+
+#fullscreen-div {
+  height: 150px;
+  padding: 1rem;
+  background-color: pink;
+}
+
+#logger {
+  height: 80px;
+  padding: 0 0.5rem;
+  background-color: white;
+  overflow: scroll;
+}
+
+        </style>
+        
+        <title>Document: fullscreenchange event - logging_fullscreenchange_events - code sample</title>
+        
+    </head>
+    <body>
+        
+            <h1>fullscreenchange event example</h1>
+<div id="fullscreen-div">
+  <button id="toggle-fullscreen">Toggle Fullscreen Mode</button>
+  <pre id="logger"></pre>
+</div>
+
+        
+        
+            <script>
+                const logger = document.querySelector("#logger");
+const fullScreenElement = document.querySelector("#fullscreen-div");
+
+function log(message) {
+  logger.textContent = `${logger.textContent}\n${message}`;
+}
+
+function fullscreenchanged(event) {
+  // document.fullscreenElement will point to the element that
+  // is in fullscreen mode if there is one. If there isn't one,
+  // the value of the property is null.
+  if (document.fullscreenElement) {
+    log(`Element: ${document.fullscreenElement.id} entered fullscreen mode.`);
+  } else {
+    log("Leaving fullscreen mode.");
+  }
+}
+
+document.addEventListener("fullscreenchange", fullscreenchanged);
+
+// When the toggle button is clicked, enter/exit fullscreen
+document.getElementById("toggle-fullscreen").addEventListener("click", () => {
+  if (document.fullscreenElement) {
+    // exitFullscreen is only available on the Document object.
+    document.exitFullscreen();
+  } else {
+    fullScreenElement.requestFullscreen();
+  }
+});
+
+            </script>
+        
+    </body>
+</html>
