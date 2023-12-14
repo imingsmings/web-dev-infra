@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="robots" content="noindex, nofollow">
+        <style>
+            body {
+              padding: 0;
+              margin: 0;
+            }
+
+            svg:not(:root) {
+              display: block;
+            }
+
+            .playable-code {
+              background-color: #f4f7f8;
+              border: none;
+              border-left: 6px solid #558abb;
+              border-width: medium medium medium 6px;
+              color: #4d4e53;
+              height: 100px;
+              width: 90%;
+              padding: 10px 10px 0;
+            }
+
+            .playable-canvas {
+              border: 1px solid #4d4e53;
+              border-radius: 2px;
+            }
+
+            .playable-buttons {
+              text-align: right;
+              width: 90%;
+              padding: 5px 10px 5px 26px;
+            }
+        </style>
+        
+        <style>
+            #container {
+  width: 150px;
+  height: 200px;
+  overflow: scroll;
+  margin: 2rem 0;
+  padding: 0.4rem;
+  border: 1px solid black;
+}
+
+        </style>
+        
+        <title>EventTarget: addEventListener() method - improving_scroll_performance_using_passive_listeners - code sample</title>
+        
+    </head>
+    <body>
+        
+            <div id="container">
+  <p>
+    But down there it would be dark now, and not the lovely lighted aquarium she
+    imagined it to be during the daylight hours, eddying with schools of tiny,
+    delicate animals floating and dancing slowly to their own serene currents
+    and creating the look of a living painting. That was wrong, in any case. The
+    ocean was different from an aquarium, which was an artificial environment.
+    The ocean was a world. And a world is not art. Dorothy thought about the
+    living things that moved in that world: large, ruthless and hungry. Like us
+    up here.
+  </p>
+</div>
+
+<div>
+  <input type="checkbox" id="passive" name="passive" checked />
+  <label for="passive">passive</label>
+</div>
+
+        
+        
+            <script>
+                const passive = document.querySelector("#passive");
+passive.addEventListener("change", (event) => {
+  container.removeEventListener("wheel", wheelHandler);
+  container.addEventListener("wheel", wheelHandler, {
+    passive: passive.checked,
+    once: true,
+  });
+});
+
+const container = document.querySelector("#container");
+container.addEventListener("wheel", wheelHandler, {
+  passive: true,
+  once: true,
+});
+
+function wheelHandler() {
+  function isPrime(n) {
+    for (let c = 2; c <= Math.sqrt(n); ++c) {
+      if (n % c === 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  const quota = 1000000;
+  const primes = [];
+  const maximum = 1000000;
+
+  while (primes.length < quota) {
+    const candidate = Math.floor(Math.random() * (maximum + 1));
+    if (isPrime(candidate)) {
+      primes.push(candidate);
+    }
+  }
+
+  console.log(primes);
+}
+
+            </script>
+        
+    </body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="robots" content="noindex, nofollow">
+        <style>
+            body {
+              padding: 0;
+              margin: 0;
+            }
+
+            svg:not(:root) {
+              display: block;
+            }
+
+            .playable-code {
+              background-color: #f4f7f8;
+              border: none;
+              border-left: 6px solid #558abb;
+              border-width: medium medium medium 6px;
+              color: #4d4e53;
+              height: 100px;
+              width: 90%;
+              padding: 10px 10px 0;
+            }
+
+            .playable-canvas {
+              border: 1px solid #4d4e53;
+              border-radius: 2px;
+            }
+
+            .playable-buttons {
+              text-align: right;
+              width: 90%;
+              padding: 5px 10px 5px 26px;
+            }
+        </style>
+        
+        <title>PointerEvent: getPredictedEvents() method - example - code sample</title>
+        
+    </head>
+    <body>
+        
+            <canvas id="target" width="600" height="300"></canvas>
+
+        
+        
+            <script>
+                const canvas = document.getElementById("target");
+const ctx = canvas.getContext("2d");
+
+const pointerEvents = [];
+
+function drawCircle(x, y, color) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // draw the last 20 events
+  if (pointerEvents.length > 20) {
+    pointerEvents.shift();
+  }
+  pointerEvents.push({ x, y, color });
+
+  for (const pointerEvent of pointerEvents) {
+    ctx.beginPath();
+    ctx.arc(pointerEvent.x, pointerEvent.y, 10, 0, 2 * Math.PI);
+    ctx.strokeStyle = pointerEvent.color;
+    ctx.stroke();
+  }
+}
+
+canvas.addEventListener("pointermove", (e) => {
+  // draw a circle for the current event
+  drawCircle(e.clientX, e.clientY, "black");
+
+  const predictedEvents = e.getPredictedEvents();
+  for (let predictedEvent of predictedEvents) {
+    // give it an offset so we can see the difference and color it red
+    drawCircle(predictedEvent.clientX + 20, predictedEvent.clientY + 20, "red");
+  }
+});
+
+            </script>
+        
+    </body>
+</html>
