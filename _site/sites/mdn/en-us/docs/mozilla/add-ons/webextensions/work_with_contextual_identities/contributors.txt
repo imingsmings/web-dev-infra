@@ -1,7 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/mozilla/add-ons/webextensions/work_with_contextual_identities/index.md
-
-# Original Wiki contributors
-ddurst
-hellosct1
-rebloor

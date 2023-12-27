@@ -1,7 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/web/api/validitystate/rangeunderflow/index.md
-
-# Original Wiki contributors
-juneate
-jasonreynolds697
-estelle

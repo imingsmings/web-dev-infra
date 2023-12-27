@@ -1,8 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/web/api/webglrenderingcontext/readpixels/index.md
-
-# Original Wiki contributors
-gmanpersona
-fscholz
-nmve
-teoli

@@ -1,8 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/glossary/robots.txt/index.md
-
-# Original Wiki contributors
-Malvoz
-tedmcox
-adithya_mani
-klez

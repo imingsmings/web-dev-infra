@@ -1,5 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/mozilla/add-ons/webextensions/api/declarativenetrequest/max_getmatchedrules_calls_per_interval/index.md
-
-# Original Wiki contributors
-

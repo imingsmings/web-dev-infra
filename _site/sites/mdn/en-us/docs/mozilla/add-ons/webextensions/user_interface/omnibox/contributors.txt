@@ -1,8 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/mozilla/add-ons/webextensions/user_interface/omnibox/index.md
-
-# Original Wiki contributors
-rebloor
-suterj
-andrewtruongmoz
-hellosct1

@@ -1,8 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/glossary/sql/index.md
-
-# Original Wiki contributors
-Abin_Abraham
-hbloomer
-klez
-Andrew_Pfeiffer

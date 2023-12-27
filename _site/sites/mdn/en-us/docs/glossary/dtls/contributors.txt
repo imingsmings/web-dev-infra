@@ -1,9 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/glossary/dtls/index.md
-
-# Original Wiki contributors
-santoshyadav198613
-sideshowbarker
-paulderek97
-verde79
-Sheppy

@@ -1,9 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/web/html/global_attributes/slot/index.md
-
-# Original Wiki contributors
-mfuji09
-alattalatta
-chrisdavidmills
-fscholz
-sideshowbarker

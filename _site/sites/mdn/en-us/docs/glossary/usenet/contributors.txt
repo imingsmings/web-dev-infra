@@ -1,9 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/glossary/usenet/index.md
-
-# Original Wiki contributors
-klez
-Andrew_Pfeiffer
-Zeba_Shah
-Sukanta.Pal
-ajinkya_p

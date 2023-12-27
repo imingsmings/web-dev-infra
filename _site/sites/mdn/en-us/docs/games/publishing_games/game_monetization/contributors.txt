@@ -1,9 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/games/publishing_games/game_monetization/index.md
-
-# Original Wiki contributors
-chrisdavidmills
-WilsonIsAliveClone
-wbamberg
-mwuestner
-end3r

@@ -1,5 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/webassembly/reference/variables/local_get/index.md
-
-# Original Wiki contributors
-

@@ -1,9 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/glossary/firefox_os/index.md
-
-# Original Wiki contributors
-lpiot
-Andrew_Pfeiffer
-hbloomer
-Biraj
-chrisdavidmills

@@ -1,7 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/glossary/cors-safelisted_response_header/index.md
-
-# Original Wiki contributors
-bulk88
-mfuji09
-fscholz

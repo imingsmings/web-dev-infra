@@ -1,9 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/glossary/statement/index.md
-
-# Original Wiki contributors
-pasalog
-hbloomer
-Andrew_Pfeiffer
-klez
-cmosman

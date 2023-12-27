@@ -1,8 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/games/techniques/tilemaps/square_tilemaps_implementation_colon__static_maps/index.md
-
-# Original Wiki contributors
-nickBlack4
-wbamberg
-chrisdavidmills
-ladybenko

@@ -1,8 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/web/http/resources_and_uris/index.md
-
-# Original Wiki contributors
-pettll
-Sheppy
-teoli
-fscholz

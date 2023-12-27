@@ -1,5 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/web/javascript/reference/errors/either_be_both_static_or_non-static/index.md
-
-# Original Wiki contributors
-

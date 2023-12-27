@@ -1,9 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/learn/common_questions/tools_and_setup/checking_that_your_web_site_is_working_properly/index.md
-
-# Original Wiki contributors
-chrisdavidmills
-Andrew_Pfeiffer
-Jeremie
-hbloomer
-notabene

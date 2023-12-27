@@ -1,7 +1,0 @@
-# Contributors by commit history
-https://github.com/mdn/content/commits/main/files/en-us/learn/common_questions/tools_and_setup/how_do_you_host_your_website_on_google_app_engine/index.md
-
-# Original Wiki contributors
-Mori
-anton-mladenov
-4a-j
