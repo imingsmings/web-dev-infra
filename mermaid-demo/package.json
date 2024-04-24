@@ -1,0 +1,15 @@
+{
+  "name": "mermaid-demo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite"
+  },
+  "dependencies": {
+    "mermaid": "^10.9.0"
+  },
+  "devDependencies": {
+    "vite": "4.5.2"
+  }
+}

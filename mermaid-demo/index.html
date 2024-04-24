@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Mermaid Quick Test Page</title>
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=" />
+    <style>
+      div.mermaid {
+        font-family: 'Courier New', Courier, monospace !important;
+      }
+
+      .mermaid>svg {
+        transition: 1s ease-in-out;
+      }
+
+      .mermaid-container {
+        position: relative;
+      }
+      .mermaid-viewer-control-panel {
+        position: absolute;
+        bottom: 1em;
+        right: 1em;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: .2em;
+      }
+      .mermaid-viewer-control-panel .control--panel-btn{
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 20px;
+        white-space: nowrap;
+        vertical-align: middle;
+        cursor: pointer;
+        user-select: none;
+        border: 1px solid;
+        border-radius: 6px;
+        appearance: none;
+        padding: 5px 7px;
+        color: #24292f;
+        background-color: #f6f8fa;
+        border-color: rgba(27,31,36,0.15);
+        box-shadow: 0 1px 0 rgba(27,31,36,0.04), inset 0 1px 0 rgba(255,255,255,0.25);
+        transition: .2s cubic-bezier(0.3, 0, 0.5, 1);
+        transition-property: color, background-color, border-color;
+      }
+      .mermaid-viewer-control-panel>.up {
+        grid-column: 2;
+        grid-row: 1;
+      }
+      .mermaid-viewer-control-panel>.down {
+        grid-column: 2;
+        grid-row: 3;
+      }
+      .mermaid-viewer-control-panel>.left {
+        grid-column: 1;
+        grid-row: 2;
+      }
+      .mermaid-viewer-control-panel>.right {
+        grid-column: 3;
+        grid-row: 2;
+      }
+      .mermaid-viewer-control-panel>.reset {
+        grid-column: 2;
+        grid-row: 2;
+      }
+      .mermaid-viewer-control-panel>.zoom-in {
+        grid-column: 3;
+        grid-row: 1;
+      }
+      .mermaid-viewer-control-panel>.zoom-out {
+        grid-column: 3;
+        grid-row: 3;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js"></script>
+  </head>
+
+  <body>
+    <h1>Sequence diagram demos</h1>
+
+    <div class="mermaid-container">
+      <pre class="mermaid" id="mermaid">
+        sequenceDiagram
+        Alice->>John: Hello John, how are you?
+        Note right of John: Rational thoughts!
+        John-->>Alice: Great!
+        John->>Bob: How about you?
+        Bob->>John: Jolly good!
+      </pre>
+      <div class="mermaid-viewer-control-panel">
+        <button class="control--panel-btn left">
+          <svg version="1.1" width="16" height="16" viewBox="0 0 16 16" class="octicon octicon-chevron-left" aria-hidden="true">
+            <path d="M9.78 12.78a.75.75 0 0 1-1.06 0L4.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042L6.06 8l3.72 3.72a.75.75 0 0 1 0 1.06Z"></path>
+          </svg>
+        </button>
+        <button class="control--panel-btn right">
+          <svg version="1.1" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z"></path></svg>
+        </button>
+        <button class="control--panel-btn up">
+          <svg version="1.1" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.22 10.53a.749.749 0 0 1 0-1.06l4.25-4.25a.749.749 0 0 1 1.06 0l4.25 4.25a.749.749 0 1 1-1.06 1.06L8 6.811 4.28 10.53a.749.749 0 0 1-1.06 0Z"></path></svg>
+        </button>
+        <button class="control--panel-btn down">
+          <svg version="1.1" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M12.78 5.22a.749.749 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.06 0L3.22 6.28a.749.749 0 1 1 1.06-1.06L8 8.939l3.72-3.719a.749.749 0 0 1 1.06 0Z"></path></svg>
+        </button>
+        <button class="control--panel-btn reset">
+          <svg version="1.1" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z"></path></svg>
+        </button>
+        <button class="control--panel-btn zoom-in">
+          <svg version="1.1" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.75 7.5a.75.75 0 0 1 .75-.75h2.25V4.5a.75.75 0 0 1 1.5 0v2.25h2.25a.75.75 0 0 1 0 1.5H8.25v2.25a.75.75 0 0 1-1.5 0V8.25H4.5a.75.75 0 0 1-.75-.75Z"></path><path d="M7.5 0a7.5 7.5 0 0 1 5.807 12.247l2.473 2.473a.749.749 0 1 1-1.06 1.06l-2.473-2.473A7.5 7.5 0 1 1 7.5 0Zm-6 7.5a6 6 0 1 0 12 0 6 6 0 0 0-12 0Z"></path></svg>
+        </button>
+        <button class="control--panel-btn zoom-out">
+          <svg version="1.1" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 6.75h6a.75.75 0 0 1 0 1.5h-6a.75.75 0 0 1 0-1.5Z"></path><path d="M0 7.5a7.5 7.5 0 1 1 13.307 4.747l2.473 2.473a.749.749 0 1 1-1.06 1.06l-2.473-2.473A7.5 7.5 0 0 1 0 7.5Zm7.5-6a6 6 0 1 0 0 12 6 6 0 0 0 0-12Z"></path></svg>
+        </button>
+      </div>
+    </div>
+    <hr />
+    <script>
+      mermaid.initialize({ startOnLoad: true });
+    </script>
+    <script>
+      const mermaidBox = document.getElementById('mermaid')
+
+      const btns = document.getElementsByClassName('mermaid-viewer-control-panel')[0]
+      const left = document.getElementsByClassName('left')[0]
+
+      btns.addEventListener('click', handler, false)
+      left.addEventListener('click', handleLeft, false)
+
+      function handler(e) {
+        const svg = mermaidBox.getElementsByTagName('svg')[0]
+      }
+
+      function handleLeft(e) {
+        const svg = mermaidBox.getElementsByTagName('svg')[0]
+        svg.style.transform = `translate(100px, 0)`
+      }
+    </script>
+  </body>
+</html>
