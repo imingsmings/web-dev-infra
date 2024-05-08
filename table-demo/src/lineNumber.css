@@ -1,0 +1,22 @@
+#editor {
+  padding-left: 10px;
+}
+#container {
+  position: relative;
+}
+#lineNumber {
+  position: absolute;
+  text-align: end;
+  top: 54px;
+  padding-left: 5px;
+  font-size: 13px;
+  line-height: 1.42;
+  vertical-align: middle;
+}
+#lineNumber > div {
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.4);
+}
+.ql-editor p {
+  line-height: 20px;
+}
