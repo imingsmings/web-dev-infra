@@ -5,7 +5,7 @@ const isProduction = process.env.NODE_ENV == 'production'
 const stylesHandler = MiniCssExtractPlugin.loader
 
 const config = {
-    entry: './src/index.js',
+    entry: './src/index.tsx',
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'bundler.js',
@@ -33,13 +33,21 @@ const config = {
         // Learn more about plugins from https://webpack.js.org/configuration/plugins/
     ],
     resolve: {
-        extensions: ['.js', '.jsx']
+        extensions: ['.js', '.jsx', '.ts', '.tsx']
     },
     module: {
         rules: [
             {
-                test: /\.(js|jsx)$/i,
-                loader: 'babel-loader'
+                test: /\.(js|jsx|ts|tsx)$/i,
+                exclude: /node_modules/,
+                use: [
+                    {
+                        loader: 'babel-loader'
+                    },
+                    {
+                        loader: 'ts-loader'
+                    }
+                ]
             },
             {
                 test: /\.css$/i,

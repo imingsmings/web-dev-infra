@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",                           
+    "jsx": "react",                              
+    "experimentalDecorators": true,               
+    "module": "ESNext",                          
+    "moduleResolution": "Node",                   
+    "baseUrl": "./",                              
+    "resolveJsonModule": true,                   
+    "declaration": true,                          
+    "outDir": "./",                           
+    "declarationDir": "./",                       
+    "esModuleInterop": true,                      
+    "strict": true,      
+  },
+  "include": [
+    "./src"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

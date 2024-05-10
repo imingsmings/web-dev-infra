@@ -1,14 +1,18 @@
 {
-  "plugins": ["@babel/syntax-dynamic-import"],
   "presets": [
     [
       "@babel/preset-env",
       {
-        "modules": false
+        "modules": false,
+        "useBuiltIns": "usage",
+        "corejs": "3"
       }
     ],
     [
       "@babel/preset-react"
+    ],
+    [
+      "@babel/preset-typescript"
     ]
   ]
 }
