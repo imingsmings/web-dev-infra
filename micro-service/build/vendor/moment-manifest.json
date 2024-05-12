@@ -1,0 +1,9 @@
+{
+  "name": "moment",
+  "content": {
+    "./node_modules/moment/moment.js": {
+      "id": 93,
+      "buildMeta": {}
+    }
+  }
+}
