@@ -7,11 +7,17 @@
     "moduleResolution": "Node",                   
     "baseUrl": "./",                              
     "resolveJsonModule": true,                   
-    "declaration": true,                          
+    // "declaration": true,                          
     "outDir": "./",                           
-    "declarationDir": "./",                       
+    // "declarationDir": "./",                       
     "esModuleInterop": true,                      
     "strict": true,      
+    "allowSyntheticDefaultImports": true
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
   },
   "include": [
     "./src"
