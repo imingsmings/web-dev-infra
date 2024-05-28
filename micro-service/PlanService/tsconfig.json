@@ -5,14 +5,17 @@
     "experimentalDecorators": true,               
     "module": "ESNext",                          
     "moduleResolution": "Node",                   
-    "baseUrl": "./",                              
+    "baseUrl": "../",                              
     "resolveJsonModule": true,                   
     // "declaration": true,                          
     "outDir": "./",                           
     // "declarationDir": "./",                       
     "esModuleInterop": true,                      
     "strict": true,      
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "BaseRequest": ["BaseService/src/api/request"]
+    },
   },
   "ts-node": {
     "compilerOptions": {

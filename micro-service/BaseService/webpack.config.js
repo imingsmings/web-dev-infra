@@ -49,7 +49,13 @@ const config = {
         modules: [
             'node_modules',
             path.resolve(ctxPath, '../node_modules')
-        ]
+        ],
+        alias: {
+            BaseRequest: path.resolve(
+                __dirname,
+                './src/api/request.ts'
+            )
+        }
     },
     module: {
         rules: [
@@ -84,38 +90,7 @@ const config = {
         ]
     },
     plugins: [
-        // new HtmlWebpackPlugin({
-        //     template: './index.html',
-        //     inject: 'body',
-        //     minify: {
-        //         minifyCSS: true,
-        //         minifyJS: true,
-        //         collapseWhitespace: true
-        //     }
-        // }),
-        // new AddAssetHtmlWebpackPlugin([
-        //     {
-        //         filepath: path.resolve(
-        //             __dirname,
-        //             './dist/vendor/react.dll.js'
-        //         ),
-        //         publicPath: '/vendor',
-        //         outputPath: 'vendor'
-        //     },
-        //     {
-        //         filepath: path.resolve(
-        //             __dirname,
-        //             './dist/vendor/antd.dll.js'
-        //         ),
-        //         publicPath: '/vendor',
-        //         outputPath: 'vendor'
-        //     }
-        // ]),
         new MiniCssExtractPlugin({}),
-        new IgnorePlugin({
-            resourceRegExp: /^\.\/locale$/,
-            contextRegExp: /moment$/
-        }),
         new DllReferencePlugin({
             context: path.resolve(ctxPath, '../'),
             manifest: path.resolve(
@@ -124,10 +99,17 @@ const config = {
             )
         }),
         new DllReferencePlugin({
-            // context: path.resolve(ctxPath, '../'),
+            context: path.resolve(ctxPath, '../'),
             manifest: path.resolve(
                 ctxPath,
                 '../build/vendor/moment-manifest.json'
+            )
+        }),
+        new DllReferencePlugin({
+            context: path.resolve(ctxPath, '../'),
+            manifest: path.resolve(
+                ctxPath,
+                '../build/vendor/BaseRequest-manifest.json'
             )
         })
     ]

@@ -12,7 +12,10 @@
     // "declarationDir": "./",                       
     "esModuleInterop": true,                      
     "strict": true,      
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "BaseRequest": ["./src/api/request.ts"]  
+    }
   },
   "ts-node": {
     "compilerOptions": {

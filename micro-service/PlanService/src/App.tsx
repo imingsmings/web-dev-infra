@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
-import { Button } from 'antd'
-import 'moment/locale/zh-cn'
+import { Tag } from 'antd'
+import { httpGet } from 'BaseRequest'
 
 export default function App() {
     const [time, setTime] = useState(
@@ -9,6 +9,7 @@ export default function App() {
     )
 
     useEffect(() => {
+        console.log(httpGet)
         let timer = setInterval(() => {
             setTime(moment().format('YYYY:MM:DD HH:mm:ss'))
         }, 1000)
@@ -21,7 +22,7 @@ export default function App() {
     return (
         <div>
             <p>{time.toString()}</p>
-            <Button type='primary'>Button</Button>
+            <Tag>Text</Tag>
         </div>
     )
 }

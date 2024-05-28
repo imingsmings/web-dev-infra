@@ -4,8 +4,6 @@ const AddAssetHtmlWebpackPlugin = require('add-asset-html-webpack-plugin')
 
 const isProduction = process.env.NODE_ENV === 'production'
 
-console.log(process.env.PWD)
-
 const config = {
     mode: isProduction ? 'production' : 'development',
     devtool: isProduction

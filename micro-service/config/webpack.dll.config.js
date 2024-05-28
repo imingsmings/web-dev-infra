@@ -1,23 +1,43 @@
-// import path from 'path'
-// import { DllPlugin } from 'webpack'
 const path = require('path')
-const {
-    DllPlugin,
-    IgnorePlugin,
-    DllReferencePlugin
-} = require('webpack')
+const { DllPlugin, IgnorePlugin } = require('webpack')
 
 const config = {
     mode: 'production',
     entry: {
         react: ['react', 'react-dom', 'antd'],
-        moment: ['moment']
+        moment: ['moment', 'lodash'],
+        BaseRequest: [
+            path.resolve(
+                __dirname,
+                '../BaseService/src/api/request.ts'
+            )
+        ]
     },
     output: {
         path: path.resolve(__dirname, '../build/vendor'),
         filename: '[name].dll.js',
         library: '[name]',
         clean: true
+    },
+    module: {
+        rules: [
+            {
+                test: /\.(js|jsx|ts|tsx)$/i,
+                exclude: /node_modules/,
+                use: [
+                    {
+                        loader: 'babel-loader',
+                        options: {
+                            cacheDirectory: true,
+                            configFile: path.resolve(
+                                __dirname,
+                                '../.babelrc'
+                            )
+                        }
+                    }
+                ]
+            }
+        ]
     },
     resolve: {
         extensions: [
@@ -37,7 +57,7 @@ const config = {
     },
     plugins: [
         new IgnorePlugin({
-            // resourceRegExp: /^\.\/locale\/^([zh\-cn])\.js$/,
+            // resourceRegExp: /^\.\/locale\/$/,
             // contextRegExp: /moment$/
             checkResource: (resource, context) => {
                 if (context.includes('moment')) {

@@ -99,14 +99,6 @@ const config: WebpackConfigOptions = {
                 ),
                 publicPath: '/vendor',
                 outputPath: 'vendor'
-            },
-            {
-                filepath: path.resolve(
-                    __dirname,
-                    './dist/vendor/antd.dll.js'
-                ),
-                publicPath: '/vendor',
-                outputPath: 'vendor'
             }
         ]),
         new MiniCssExtractPlugin({}),
@@ -118,13 +110,6 @@ const config: WebpackConfigOptions = {
             manifest: path.resolve(
                 __dirname,
                 './dist/vendor/react-manifest.json'
-            ),
-            extensions: ['.js', '.jsx', '.ts', '.tsx']
-        }),
-        new DllReferencePlugin({
-            manifest: path.resolve(
-                __dirname,
-                './dist/vendor/antd-manifest.json'
             ),
             extensions: ['.js', '.jsx', '.ts', '.tsx']
         })

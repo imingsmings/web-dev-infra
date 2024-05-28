@@ -1,17 +1,9 @@
-// import path from 'path'
-// import HtmlWebpackPlugin from 'html-webpack-plugin'
-// import MiniCssExtractPlugin from 'mini-css-extract-plugin'
-// import AddAssetHtmlWebpackPlugin from 'add-asset-html-webpack-plugin'
-// import { IgnorePlugin, DllReferencePlugin } from 'webpack'
 const path = require('path')
-// const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const {
     IgnorePlugin,
     DllReferencePlugin
 } = require('webpack')
-
-// console.log(process.env.PWD)
 
 const ctxPath = process.env.PWD
 
@@ -57,7 +49,17 @@ const config = {
         modules: [
             'node_modules',
             path.resolve(ctxPath, '../node_modules')
-        ]
+        ],
+        alias: {
+            BaseService: path.resolve(
+                __dirname,
+                '../BaseService'
+            ),
+            BaseRequest: path.resolve(
+                __dirname,
+                '../BaseService/src/api/request.ts'
+            )
+        }
     },
     module: {
         rules: [
@@ -92,38 +94,7 @@ const config = {
         ]
     },
     plugins: [
-        // new HtmlWebpackPlugin({
-        //     template: './index.html',
-        //     inject: 'body',
-        //     minify: {
-        //         minifyCSS: true,
-        //         minifyJS: true,
-        //         collapseWhitespace: true
-        //     }
-        // }),
-        // new AddAssetHtmlWebpackPlugin([
-        //     {
-        //         filepath: path.resolve(
-        //             __dirname,
-        //             './dist/vendor/react.dll.js'
-        //         ),
-        //         publicPath: '/vendor',
-        //         outputPath: 'vendor'
-        //     },
-        //     {
-        //         filepath: path.resolve(
-        //             __dirname,
-        //             './dist/vendor/antd.dll.js'
-        //         ),
-        //         publicPath: '/vendor',
-        //         outputPath: 'vendor'
-        //     }
-        // ]),
         new MiniCssExtractPlugin({}),
-        new IgnorePlugin({
-            resourceRegExp: /^\.\/locale$/,
-            contextRegExp: /moment$/
-        }),
         new DllReferencePlugin({
             context: path.resolve(ctxPath, '../'),
             manifest: path.resolve(
@@ -136,6 +107,13 @@ const config = {
             manifest: path.resolve(
                 ctxPath,
                 '../build/vendor/moment-manifest.json'
+            )
+        }),
+        new DllReferencePlugin({
+            context: path.resolve(ctxPath, '../'),
+            manifest: path.resolve(
+                ctxPath,
+                '../build/vendor/BaseRequest-manifest.json'
             )
         })
     ]

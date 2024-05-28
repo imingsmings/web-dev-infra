@@ -4,6 +4,10 @@
     "./node_modules/moment/moment.js": {
       "id": 93,
       "buildMeta": {}
+    },
+    "./node_modules/lodash/lodash.js": {
+      "id": 543,
+      "buildMeta": {}
     }
   }
 }

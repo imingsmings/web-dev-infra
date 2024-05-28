@@ -6,8 +6,7 @@ import type { WebpackConfigOptions } from './webpack.config'
 const config: WebpackConfigOptions = {
     mode: 'production',
     entry: {
-        react: ['react', 'react-dom'],
-        antd: 'antd'
+        react: ['react', 'react-dom', 'antd']
     },
     output: {
         path: path.resolve(__dirname, 'dist/vendor'),

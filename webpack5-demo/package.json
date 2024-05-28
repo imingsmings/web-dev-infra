@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "node --loader ts-node/esm ./node_modules/webpack-cli/bin/cli.js serve  --mode development --node-env=development --config webpack.config.ts",
-    "build": "node --loader ts-node/esm ./node_modules/webpack-cli/bin/cli.js  --mode production --node-env=production --config webpack.config.ts",
-    "build:dll": "node --loader ts-node/esm ./node_modules/webpack-cli/bin/cli.js  --mode production --node-env=production --config webpack.dll.config.ts",
+    "dev": "yarn build:dll && webpack serve --mode development --node-env=development --config ./webpack.config.ts",
+    "build": "webpack build --mode production --node-env=production --config webpack.config.ts",
+    "build:dll": "webpack build --mode production --node-env=production --config webpack.dll.config.ts",
     "build:all": "yarn build:dll && yarn build"
   },
   "keywords": [],

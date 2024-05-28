@@ -1,0 +1,16 @@
+{
+  "name": "BaseRequest",
+  "content": {
+    "./BaseService/src/api/request.ts": {
+      "id": 695,
+      "buildMeta": {
+        "exportsType": "namespace",
+        "sideEffectFree": true
+      },
+      "exports": [
+        "httpGet",
+        "httpPost"
+      ]
+    }
+  }
+}
