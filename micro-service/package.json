@@ -4,10 +4,12 @@
   "main": "index.js",
   "scripts": {
     "build:dll": "webpack build --config ./config/webpack.dll.config.js",
-    "build:common": "webpack build --mode production --node-env=production --config ./config/webpack.common.config.js",
-    "build:base": "cd BaseService && webpack build --mode production --node-env=production --config ./webpack.config.js",
-    "build:plan": "cd PlanService && webpack build --mode production --node-env=production --config ./webpack.config.js",
-    "build:all": "yarn build:dll && yarn build:common && yarn build:base && yarn build:plan"
+    "build:common": "npm run check:dll && webpack build --mode production --node-env=production --config ./config/webpack.common.config.js",
+    "build:base": "npm run check:dll && cd BaseService && webpack build --mode production --node-env=production --config ./webpack.config.js",
+    "build:plan": "npm run check:dll && cd PlanService && webpack build --mode production --node-env=production --config ./webpack.config.js",
+    "build:all": "yarn build:dll && yarn build:common && yarn build:base && yarn build:plan",
+    "check:dll": "node ./config/check.dll.js",
+    "build": "node ./config/build.js"
   },
   "keywords": [],
   "author": "",
