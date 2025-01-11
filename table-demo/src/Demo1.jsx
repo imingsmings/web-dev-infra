@@ -18,7 +18,7 @@ const Component = () => {
 
     const theme = useTheme({
         Table: `
-        --data-table-library_grid-template-columns:  250px 150px 25% 25% 50%;
+        --data-table-library_grid-template-columns: 20% 20% 20% 20% 20%;
       `,
         BaseCell: `
         &:nth-of-type(1) {
