@@ -15,7 +15,8 @@
     "antd": "^3.26.20",
     "quill": "2.0.1",
     "react": "^16.14.0",
-    "react-dom": "^16.14.0"
+    "react-dom": "^16.14.0",
+    "react-resizable": "^3.0.5"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",
