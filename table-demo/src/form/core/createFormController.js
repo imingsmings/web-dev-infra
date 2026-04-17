@@ -1,0 +1,26 @@
+export default function createFormController(host) {
+  return {
+    getForm: (...args) => host.getForm(...args),
+    getValues: (...args) => host.getValues(...args),
+    getValue: (...args) => host.getValue(...args),
+    setValues: (...args) => host.setValues(...args),
+    setErrors: (...args) => host.setErrors(...args),
+    getFieldError: (...args) => host.getFieldError(...args),
+    getFieldsError: (...args) => host.getFieldsError(...args),
+    isFieldTouched: (...args) => host.isFieldTouched(...args),
+    isFieldsTouched: (...args) => host.isFieldsTouched(...args),
+    isFieldValidating: (...args) => host.isFieldValidating(...args),
+    isFieldsValidating: (...args) => host.isFieldsValidating(...args),
+    setExtraErrors: (...args) => host.setExtraErrors(...args),
+    getExtraErrors: (...args) => host.getExtraErrors(...args),
+    getExtraError: (...args) => host.getExtraError(...args),
+    resetExtraErrors: (...args) => host.resetExtraErrors(...args),
+    reset: (...args) => host.reset(...args),
+    validate: (...args) => host.validate(...args),
+    validateAndScroll: (...args) => host.validateAndScroll(...args),
+    scrollToError: (...args) => host.scrollToError(...args),
+    submit: (...args) => host.submit(...args),
+    reinitialize: (...args) => host.reinitialize(...args),
+    isSubmitting: (...args) => host.isSubmitting(...args),
+  }
+}
