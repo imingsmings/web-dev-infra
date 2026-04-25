@@ -3,6 +3,7 @@ import { buildStorageApi } from './api'
 
 const API_BASE = ''
 const ROOTS_RETRY_DELAYS = [150, 400, 800]
+const LIST_CACHE_TTL = 1000
 
 function normalizePath(path) {
   if (!path || path === '/') {
@@ -249,6 +250,57 @@ function toBatchDownloadPath(itemPath) {
 export function createStorageAdapter(protocol) {
   const api = buildStorageApi(protocol)
   let rootsRequest = null
+  const listRequestCache = new Map()
+
+  function buildListCacheKey(params) {
+    return JSON.stringify({
+      path: normalizePath(params.path),
+      q: params.q || '',
+      rootId: params.rootId
+    })
+  }
+
+  function fetchStorageObjects(params) {
+    const normalizedPath = normalizePath(params.path)
+    const cacheKey = buildListCacheKey({
+      rootId: params.rootId,
+      path: normalizedPath,
+      q: params.q
+    })
+    const now = Date.now()
+    const cached = listRequestCache.get(cacheKey)
+
+    if (cached) {
+      if (cached.promise) {
+        return cached.promise
+      }
+
+      if (now - cached.timestamp < LIST_CACHE_TTL) {
+        return Promise.resolve(cached.payload)
+      }
+    }
+
+    const request = requestJson(`${api.list.path}/${encodeURIComponent(params.rootId)}`, {
+      prefix: toApiPrefix(normalizedPath),
+      condition: params.q || ''
+    }).then(function cacheListPayload(payload) {
+      listRequestCache.set(cacheKey, {
+        payload,
+        timestamp: Date.now()
+      })
+      return payload
+    }).catch(function clearFailedRequest(error) {
+      listRequestCache.delete(cacheKey)
+      throw error
+    })
+
+    listRequestCache.set(cacheKey, {
+      promise: request,
+      timestamp: now
+    })
+
+    return request
+  }
 
   return {
     protocol,
@@ -277,8 +329,10 @@ export function createStorageAdapter(protocol) {
     },
 
     fetchTree(params) {
-      return requestJson(`${api.list.path}/${encodeURIComponent(params.rootId)}`, {
-        prefix: toApiPrefix(params.path)
+      return fetchStorageObjects({
+        rootId: params.rootId,
+        path: params.path,
+        q: ''
       }).then(function mapTreeItems(payload) {
         const objects = payload && payload.data && Array.isArray(payload.data.objects) ? payload.data.objects : []
 
@@ -304,9 +358,10 @@ export function createStorageAdapter(protocol) {
     fetchList(params) {
       const normalizedPath = normalizePath(params.path)
 
-      return requestJson(`${api.list.path}/${encodeURIComponent(params.rootId)}`, {
-        prefix: toApiPrefix(normalizedPath),
-        condition: params.q || ''
+      return fetchStorageObjects({
+        rootId: params.rootId,
+        path: normalizedPath,
+        q: params.q
       }).then(function mapListResponse(payload) {
         const objects = payload && payload.data && Array.isArray(payload.data.objects) ? payload.data.objects : []
         let items = objects.map(mapEntry)
