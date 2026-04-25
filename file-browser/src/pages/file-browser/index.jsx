@@ -4,6 +4,14 @@ import { message } from 'antd';
 import FileBrowserView from './components/FileBrowserView';
 import useFileBrowserData from './hooks/useFileBrowserData';
 
+const getDownloadPath = (item) => {
+  if (!item) {
+    return '';
+  }
+
+  return item.downloadPath || item.path;
+};
+
 const FileBrowser = (props) => {
   const { adapter, doubleClickFileToDownload, onChange, value } = props;
   const [searchInput, setSearchInput] = useState(value.q || '');
@@ -48,7 +56,7 @@ const FileBrowser = (props) => {
     const request = record.isDirectory
       ? adapter.downloadBatch({
         rootId: value.root,
-        paths: [record.path]
+        paths: [getDownloadPath(record)]
       })
       : adapter.downloadFile({
         rootId: value.root,
@@ -66,7 +74,7 @@ const FileBrowser = (props) => {
     adapter.downloadBatch({
       rootId: value.root,
       paths: selectedItems.map((item) => {
-        return item.path;
+        return getDownloadPath(item);
       })
     }).then(() => {
       message.success(`Download queued for ${selectedItems.length} item(s)`);

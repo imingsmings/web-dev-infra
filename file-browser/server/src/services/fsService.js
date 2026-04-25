@@ -205,14 +205,17 @@ async function listStorageBucketObjects(protocol, rootId, prefix, condition) {
     q: condition,
     type: 'all'
   }).map(function mapStorageObject(entry) {
+    const rawPath = entry.path.replace(/^\//, '');
+    const storagePath = entry.isDirectory ? `${rawPath}/` : rawPath;
+
     return {
       bucketName: rootId,
       directory: entry.isDirectory,
       hasChildren: entry.isDirectory ? entry.hasChildren : false,
-      key: entry.path.replace(/^\//, ''),
+      key: storagePath,
       lastModified: formatTimestamp(entry.updatedAt),
       name: entry.name,
-      path: entry.path.replace(/^\//, ''),
+      path: storagePath,
       size: entry.size || 0
     };
   });

@@ -175,11 +175,13 @@ function sortItems(items, sortValue) {
 }
 
 function mapEntry(item) {
-  const relativePath = `/${String(item.path || '').replace(/^\/+/, '')}`
+  const rawPath = String(item.path || '')
+  const relativePath = normalizePath(rawPath)
   const fileName = item.name || relativePath.split('/').filter(Boolean).pop() || ''
   const ext = fileName.includes('.') ? fileName.split('.').pop().toLowerCase() : ''
 
   return {
+    downloadPath: rawPath,
     key: relativePath,
     name: fileName,
     path: relativePath,
@@ -236,6 +238,14 @@ async function downloadBlobResponse(response, fallbackFileName, defaultErrorMess
   window.URL.revokeObjectURL(downloadUrl)
 }
 
+function toBatchDownloadPath(itemPath) {
+  if (!itemPath) {
+    return ''
+  }
+
+  return String(itemPath).replace(/^\/+/, '')
+}
+
 export function createStorageAdapter(protocol) {
   const api = buildStorageApi(protocol)
   let rootsRequest = null
@@ -277,11 +287,13 @@ export function createStorageAdapter(protocol) {
             return Boolean(item.directory)
           })
           .map(function mapDir(item) {
+            const normalizedPath = normalizePath(item.path)
+
             return {
-              key: `/${String(item.path || '').replace(/^\/+/, '')}`,
+              key: normalizedPath,
               rootId: params.rootId,
               title: item.name,
-              path: `/${String(item.path || '').replace(/^\/+/, '')}`,
+              path: normalizedPath,
               isLeaf: item.hasChildren === false,
               loaded: false
             }
@@ -348,7 +360,7 @@ export function createStorageAdapter(protocol) {
         },
         body: JSON.stringify(
           params.paths.map(function mapPath(itemPath) {
-            return normalizePath(itemPath).replace(/^\//, '')
+            return toBatchDownloadPath(itemPath)
           })
         )
       })
