@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Icon, Spin, Tree, message } from 'antd';
 import { getAncestorPaths, normalizePath } from '../utils/path';
@@ -84,8 +84,27 @@ const DirectoryTreePanel = (props) => {
       return createRootNode(root.id);
     });
   });
-  const [expandedKeys, setExpandedKeys] = useState([]);
+  const [manualExpandedKeys, setManualExpandedKeys] = useState([]);
+  const [collapsedSyncedKeys, setCollapsedSyncedKeys] = useState([]);
+  const [syncedExpandedKeys, setSyncedExpandedKeys] = useState([]);
   const [treeLoading, setTreeLoading] = useState(false);
+  const treeDataRef = useRef(treeData);
+
+  useEffect(() => {
+    treeDataRef.current = treeData;
+  }, [treeData]);
+
+  const expandedKeys = useMemo(() => {
+    return Array.from(
+      new Set(
+        syncedExpandedKeys
+          .filter((key) => {
+            return collapsedSyncedKeys.indexOf(key) === -1;
+          })
+          .concat(manualExpandedKeys)
+      )
+    );
+  }, [collapsedSyncedKeys, manualExpandedKeys, syncedExpandedKeys]);
 
   useEffect(
     () => {
@@ -93,8 +112,11 @@ const DirectoryTreePanel = (props) => {
         return createRootNode(root.id);
       });
 
+      treeDataRef.current = nextTreeData;
       setTreeData(nextTreeData);
-      setExpandedKeys([]);
+      setCollapsedSyncedKeys([]);
+      setManualExpandedKeys([]);
+      setSyncedExpandedKeys([]);
     },
     [roots]
   );
@@ -104,28 +126,30 @@ const DirectoryTreePanel = (props) => {
       let active = true;
 
       const ensureAncestorsLoaded = async () => {
-        if (normalizePath(currentPath) === ROOT_PATH) {
+        if (!rootId || normalizePath(currentPath) === ROOT_PATH) {
+          setTreeLoading(false);
           return;
         }
 
         setTreeLoading(true);
-        const ancestors = getAncestorPaths(currentPath);
-        setExpandedKeys((prevExpandedKeys) => {
-          const merged = prevExpandedKeys.slice();
+        const pathsToLoad = getAncestorPaths(currentPath).slice(0, -1);
+        const nextSyncedKeys = pathsToLoad.map((path) => {
+          return buildNodeKey(rootId, path);
+        });
 
-          ancestors.forEach((path) => {
-            const nextKey = buildNodeKey(rootId, path);
+        setSyncedExpandedKeys((prevSyncedExpandedKeys) => {
+          const mergedSyncedKeys = prevSyncedExpandedKeys.slice();
 
-            if (merged.indexOf(nextKey) === -1) {
-              merged.push(nextKey);
+          nextSyncedKeys.forEach((key) => {
+            if (mergedSyncedKeys.indexOf(key) === -1) {
+              mergedSyncedKeys.push(key);
             }
           });
 
-          return merged;
+          return mergedSyncedKeys;
         });
 
-        let workingTreeData = treeData;
-        const pathsToLoad = ancestors.slice(0, -1);
+        let workingTreeData = treeDataRef.current;
 
         for (let i = 0; i < pathsToLoad.length; i += 1) {
           const ancestorPath = pathsToLoad[i];
@@ -148,6 +172,7 @@ const DirectoryTreePanel = (props) => {
         }
 
         if (active) {
+          treeDataRef.current = workingTreeData;
           setTreeData(workingTreeData);
           setTreeLoading(false);
         }
@@ -166,7 +191,7 @@ const DirectoryTreePanel = (props) => {
         active = false;
       };
     },
-    [currentPath, loadTree, rootId, treeData]
+    [currentPath, loadTree, rootId]
   );
 
   const handleLoadData = (treeNode) => {
@@ -182,11 +207,13 @@ const DirectoryTreePanel = (props) => {
       path: propsData.path
     }).then((children) => {
       setTreeData((prevTreeData) => {
-        return injectChildren(
+        const nextTreeData = injectChildren(
           prevTreeData,
           propsData.key,
           decorateChildNodes(propsData.rootId, children)
         );
+        treeDataRef.current = nextTreeData;
+        return nextTreeData;
       });
       setTreeLoading(false);
     }).catch(() => {
@@ -223,7 +250,28 @@ const DirectoryTreePanel = (props) => {
             expandedKeys={expandedKeys}
             loadData={handleLoadData}
             onExpand={(keys) => {
-              setExpandedKeys(keys);
+              const collapsedKeys = expandedKeys.filter((key) => {
+                return keys.indexOf(key) === -1;
+              });
+
+              setCollapsedSyncedKeys((prevCollapsedSyncedKeys) => {
+                const mergedCollapsedKeys = prevCollapsedSyncedKeys
+                  .filter((key) => {
+                    return syncedExpandedKeys.indexOf(key) > -1 && keys.indexOf(key) === -1;
+                  })
+                  .concat(
+                    collapsedKeys.filter((key) => {
+                      return syncedExpandedKeys.indexOf(key) > -1 && prevCollapsedSyncedKeys.indexOf(key) === -1;
+                    })
+                  );
+
+                return mergedCollapsedKeys;
+              });
+              setManualExpandedKeys(
+                keys.filter((key) => {
+                  return syncedExpandedKeys.indexOf(key) === -1;
+                })
+              );
             }}
             onSelect={(keys) => {
               if (!keys.length) {
