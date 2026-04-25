@@ -130,3 +130,5 @@ dist
 .yarn/install-state.gz
 .pnp.*
 echarts-map/.DS_Store
+
+low-code
