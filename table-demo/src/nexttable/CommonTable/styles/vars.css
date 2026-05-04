@@ -1,0 +1,58 @@
+:root {
+    --wx-spec-error: #ed3b3b;
+    --wx-spec-warning: #f5a218;
+    --wx-spec-success: #10b900;
+    --wx-spec-primary: #1c6aff;
+    --wx-spec-disabled: #656774;
+    --wx-spec-pending: #ed6b0e;
+    --wx-spec-primary-hover: #438dff;
+    --wx-spec-primary-active: #004cc3;
+    --wx-spec-bg: #f2f4f7;
+    --wx-spec-label: #4b4c57;
+    --wx-spec-border-color: #dfe3ea;
+    --wx-spec-border-color-x: #d8dce5;
+    --wx-spec-header-bg: #f7f8fb;
+    --wx-spec-header-bg-sub: #edeff3;
+    --wx-spec-disabled-text: #b1bece;
+    --wx-spec-white: #ffffff;
+    --wx-spec-white-middle: rgba(255, 255, 255, 0.65);
+    --wx-spec-black: #000000;
+    --wx-spec-black-middle: rgba(0, 0, 0, 0.4);
+    --wx-spec-black-tiny: #9c9da6;
+    --wx-spec-header-bg-text: var(--wx-spec-label);
+    --wx-spec-body-text: var(--wx-spec-disabled);
+    --wx-spec-hover-bg: rgba(28, 106, 255, 0.05);
+    --wx-spec-hover-border: rgba(28, 106, 255, 0.4);
+    --wx-spec-border: rgba(223, 227, 234, 1);
+    --wx-spec-placehoder-color: var(--wx-spec-disabled-text);
+    --wx-spec-disabled-border: var(--wx-spec-border-color-x);
+    --wx-spec-disabled-input-text: #656774;
+    --wx-spec-switch-disabled-bg: #c7ced9;
+    --wx-spec-icon-hover: rgba(0, 0, 0, 0.12);
+    --wx-spec-icon-hover-sub: rgba(0, 0, 0, 0.08);
+    --wx-spec-row-selection: #f3f7ff;
+
+    --wx-font-size-xxlarge: 24px;
+    --wx-font-size-xlarge: 20px;
+    --wx-font-size-large: 18px;
+    --wx-font-size-medium: 16px;
+    --wx-font-size-tiny: 14px;
+    --wx-font-size-small: 12px;
+    --wx-spec-font-size: var(--wx-font-size-medium);
+    --wx-spec-font-weight: 700;
+    --wx-spec-font-weight-tiny: 400;
+    --wx-spec-border-radius: 2px;
+    --wx-spec-table-cell-height: 38px;
+
+    --common-element-height: 36px;
+    --default-font-size: var(--wx-font-size-tiny);
+    --primary-color: var(--wx-spec-primary);
+    --danger-color: var(--wx-spec-error);
+    --disabled-color: var(--wx-spec-disabled-text);
+    --text-white-color: var(--wx-spec-white);
+    --table-column-th-bg: var(--wx-spec-bg);
+    --table-column-th-text-color: var(--wx-spec-header-bg-text);
+    --table-column-td-text-color: var(--wx-spec-body-text);
+    --common-border-radius: var(--wx-spec-border-radius);
+    --font-weight-middle: var(--wx-spec-font-weight);
+}

@@ -1,0 +1,2 @@
+export const DEFAULT_VIRTUAL_ROW_HEIGHT = 38
+export const DEFAULT_VIRTUAL_OVERSCAN = 8

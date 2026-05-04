@@ -1,0 +1,233 @@
+@import '~react-resizable/css/styles.css';
+
+@common-table-prefix: wx__common__table__;
+
+.@{common-table-prefix}container {
+    --spacing: 5px;
+
+    .@{common-table-prefix}wrapper {
+        &.@{common-table-prefix}empty {
+            .ant-table-body {
+                overflow-x: scroll !important;
+                position: initial;
+            }
+        }
+
+        th.ant-table-selection-column {
+            background-color: var(--table-column-th-bg) !important;
+        }
+
+        th.@{common-table-prefix}column {
+            .ant-table-column-sorter {
+                .ant-table-column-sorter-inner {
+                    margin-top: -4.15px;
+                }
+            }
+        }
+
+        .ant-table-selection-column {
+            background: unset !important;
+        }
+
+        .ant-table-row-hover {
+            background-color: var(--wx-spec-header-bg);
+        }
+
+        .ant-table-row-selected {
+            background-color: var(--wx-spec-row-selection);
+        }
+
+        td.@{common-table-prefix}column {
+            background: unset !important;
+        }
+
+        table {
+            table-layout: fixed;
+        }
+
+        .ant-table-row-expand-icon + .@{common-table-prefix}cell__wrapper {
+            display: inline;
+        }
+
+        .@{common-table-prefix}pagination {
+            &.ant-table-pagination {
+                margin: calc(var(--spacing) * 2) 0;
+                &.only-show-total {
+                    :not(.ant-pagination-total-text) {
+                        display: none;
+                    }
+                }
+            }
+
+            .ant-pagination-item-active {
+                background-color: var(--wx-spec-primary);
+                > a {
+                    color: var(--text-white-color);
+                }
+            }
+        }
+
+        .@{common-table-prefix}search__wrapper {
+            padding: 8px;
+            .@{common-table-prefix}search__input {
+                width: calc(var(--spacing) * 36);
+            }
+        }
+
+        .@{common-table-prefix}filtered {
+            color: var(--primary-color);
+        }
+    }
+    .@{common-table-prefix}footer {
+        left: 0;
+        bottom: calc(var(--spacing) * 3);
+        font-size: var(--default-font-size);
+        color: var(--wx-spec-body-text);
+
+        svg {
+            width: var(--wx-font-size-medium);
+            height: var(--wx-font-size-medium);
+        }
+
+        .@{common-table-prefix}footer_extra {
+            padding: 0 var(--spacing);
+            border-radius: var(--common-border-radius);
+        }
+    }
+    .@{common-table-prefix}swap {
+        position: absolute;
+        z-index: 999;
+        right: 1px;
+        top: 1px;
+        width: calc(var(--spacing) * 4);
+        height: calc(var(--wx-spec-table-cell-height) - 1px);
+        background-color: var(--table-column-th-bg);
+        > i {
+            transform: rotate(90deg);
+        }
+    }
+    .@{common-table-prefix}draggable {
+        cursor: move;
+    }
+    .ant-empty-normal {
+        margin: 0;
+        color: var(--wx-spec-header-bg-text);
+        .ant-empty-image {
+            display: none;
+        }
+    }
+
+    .react-resizable {
+        .react-resizable-handle {
+            display: inline-flex;
+            width: calc(var(--spacing) * 2);
+            height: var(--wx-spec-table-cell-height);
+            right: 0;
+            cursor: col-resize;
+            background-image: none;
+            &.resizing {
+                width: 100%;
+            }
+        }
+    }
+}
+
+.@{common-table-prefix}swap__wrapper {
+    --spacing: 5px;
+
+    .ant-dropdown {
+        background-color: var(--wx-spec-white);
+        padding: var(--spacing) calc(var(--spacing) * 2);
+        box-shadow: 0 4px 12px var(--wx-spec-icon-hover);
+        max-height: calc(var(--spacing) * 60);
+        overflow: auto;
+        .ant-checkbox-wrapper {
+            margin-left: 0;
+        }
+    }
+}
+
+.table-action-more-wrapper {
+    .table-action-menu {
+        &:not(.ant-dropdown-menu-item-disabled) {
+            &:hover {
+                color: var(--wx-spec-primary);
+                background-color: transparent;
+            }
+        }
+    }
+}
+
+.table-action-wrapper {
+    .table__icon {
+        padding: 0 2px;
+        height: var(--wx-font-size-xxlarge);
+        &:not(&.disabled):hover {
+            background-color: var(--wx-spec-icon-hover-sub);
+            border-radius: var(--wx-spec-border-radius);
+        }
+        &.disabled {
+            cursor: not-allowed;
+        }
+    }
+}
+
+.table-operation-wrapper {
+    margin-top: 30px;
+    margin-bottom: 15px;
+
+    --color: #004cc3;
+
+    .table-operation-right {
+        .table-operation-button {
+            padding: 0 16px;
+
+            &::after {
+                content: none;
+            }
+        }
+
+        .table-operation-button.text {
+            outline: none;
+            border: none;
+            &:hover {
+                text-decoration: underline;
+            }
+            &:focus {
+                color: var(--color);
+            }
+            &:active {
+                color: var(--primary-color);
+            }
+        }
+
+        .table-operation-button.outlined {
+            &:hover,
+            &:active {
+                background: var(--wx-spec-hover-bg);
+                border: 1px solid var(--wx-spec-hover-border);
+            }
+            &:focus {
+                background: var(--wx-spec-hover-bg);
+                border: 1px solid var(--color);
+            }
+        }
+
+        .table-operation-button.solid {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: var(--text-white-color);
+            &:hover {
+                background: var(--wx-spec-primary-hover);
+                border-color: var(--wx-spec-primary-hover);
+            }
+            &:focus {
+                background: var(--color);
+            }
+        }
+
+        .table-operation-button:not(:last-child) {
+            margin-right: 6px;
+        }
+    }
+}

@@ -1,0 +1,235 @@
+.wx__common__table__container .ant-table .ant-table-thead th,
+.wx__common__table__container .ant-table .ant-table-tbody tr.ant-table-row td {
+    line-height: var(--wx-spec-table-cell-height) !important;
+    padding: 0 7px !important;
+    font-size: var(--default-font-size);
+}
+
+.wx__common__table__container .ant-table .ant-table-thead th {
+    font-weight: var(--wx-spec-font-weight) !important;
+    border-bottom: none !important;
+    background-color: var(--table-column-th-bg) !important;
+    color: var(--table-column-th-text-color) !important;
+}
+
+.wx__common__table__container .ant-table tr.ant-table-row td {
+    color: var(--table-column-td-text-color);
+}
+
+.wx__common__table__container .ant-table th.ant-table-selection-column,
+.wx__common__table__container .ant-table td.ant-table-selection-column {
+    min-width: 30px;
+    width: 30px;
+}
+
+.wx__common__table__container .ant-table-thead > tr > th .ant-table-column-sorter .ant-table-column-sorter-inner {
+    color: var(--wx-spec-placehoder-color);
+}
+
+.wx__common__table__container .ant-table-thead > tr > th .ant-table-column-sorter .ant-table-column-sorter-inner .ant-table-column-sorter-up.on,
+.wx__common__table__container .ant-table-thead > tr > th .ant-table-column-sorter .ant-table-column-sorter-inner .ant-table-column-sorter-down.on {
+    color: var(--primary-color);
+}
+
+.wx__common__table__container .ant-table-bordered .ant-table-thead > tr:not(:last-child) > th {
+    border-bottom: 1px solid #e8e8e8 !important;
+}
+
+.wx__common__table__container .ant-table-header {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    overflow: hidden !important;
+}
+
+.wx__common__table__container .ant-table-placeholder {
+    background-color: var(--wx-spec-white);
+}
+
+.wx__common__table__container .ant-table-fixed-right table,
+.wx__common__table__container .ant-table-fixed-left table,
+.wx__common__table__container .ant-table-scroll table {
+    table-layout: fixed;
+}
+
+.wx__common__table__container .ant-table-fixed-right .ant-table-thead > tr > th,
+.wx__common__table__container .ant-table-fixed-right .ant-table-tbody > tr > td,
+.wx__common__table__container .ant-table-fixed-left .ant-table-thead > tr > th,
+.wx__common__table__container .ant-table-fixed-left .ant-table-tbody > tr > td {
+    background-clip: padding-box;
+}
+
+.wx__common__table__container .ant-table-fixed-right .ant-table-tbody > tr > td:last-child,
+.wx__common__table__container .ant-table-fixed-right .ant-table-thead > tr > th:last-child {
+    box-shadow: none;
+}
+
+.wx__common__table__container .wx__common__table__virtual .ant-table-header > table,
+.wx__common__table__container .wx__common__table__virtual .ant-table-body > .wx__common__table__virtual__canvas > table {
+    border-spacing: 0;
+    border-collapse: separate;
+}
+
+.wx__common__table__container .wx__common__table__virtual .ant-table-body > .wx__common__table__virtual__canvas > table {
+    border-top: 0;
+    border-left: 1px solid #e8e8e8;
+    border-right: 0;
+    border-bottom: 0;
+}
+
+.wx__common__table__container .wx__common__table__virtual .ant-table-thead > tr > th,
+.wx__common__table__container .wx__common__table__virtual .ant-table-tbody > tr > td {
+    box-sizing: border-box;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-thead > tr > th,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr > td {
+    box-sizing: border-box;
+    padding: 0 7px !important;
+    font-size: var(--default-font-size) !important;
+    line-height: var(--wx-spec-table-cell-height) !important;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-thead > tr > th {
+    font-weight: var(--wx-spec-font-weight) !important;
+    background: var(--table-column-th-bg) !important;
+    color: var(--table-column-th-text-color) !important;
+    border-bottom: 1px solid #e8e8e8 !important;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr > td {
+    color: var(--table-column-td-text-color) !important;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .wx__virtual__fixed-left,
+.wx__common__table__container .wx__common__table__virtual-base .wx__virtual__fixed-right {
+    background-clip: padding-box;
+    transition: box-shadow 0.3s ease, background-color 0.3s ease, outline-color 0.2s ease;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-thead > tr > th.wx__virtual__fixed-left,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-thead > tr > th.wx__virtual__fixed-right {
+    background: var(--table-column-th-bg) !important;
+    z-index: 4 !important;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr > td.wx__virtual__fixed-left,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr > td.wx__virtual__fixed-right {
+    background: var(--wx-spec-white) !important;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-thead > tr > th.wx__virtual__fixed-right,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr > td.wx__virtual__fixed-right {
+    overflow: hidden;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-thead > tr > th.wx__virtual__fixed-right.wx__common__table__operation_column,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr > td.wx__virtual__fixed-right.wx__common__table__operation_column {
+    /* padding-left: 12px !important; */
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-thead > tr > th.wx__virtual__before-fixed-right,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr > td.wx__virtual__before-fixed-right {
+    /* padding-right: 12px !important; */
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr.ant-table-row-hover > td.wx__virtual__fixed-left,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr.ant-table-row-hover > td.wx__virtual__fixed-right,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr:hover > td.wx__virtual__fixed-left,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr:hover > td.wx__virtual__fixed-right {
+    background: var(--wx-spec-header-bg) !important;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr.ant-table-row-selected > td.wx__virtual__fixed-left,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr.ant-table-row-selected > td.wx__virtual__fixed-right,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr.ant-table-row-selected:hover > td.wx__virtual__fixed-left,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr.ant-table-row-selected:hover > td.wx__virtual__fixed-right {
+    background: var(--wx-spec-row-selection) !important;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr:focus-within > td.wx__virtual__fixed-left,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr:focus-within > td.wx__virtual__fixed-right {
+    background: var(--wx-spec-header-bg) !important;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr.ant-table-row-selected:focus-within > td.wx__virtual__fixed-left,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr.ant-table-row-selected:focus-within > td.wx__virtual__fixed-right {
+    background: var(--wx-spec-row-selection) !important;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-thead,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-header {
+    position: relative;
+    z-index: 3;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table {
+    position: relative;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-body {
+    position: relative;
+    z-index: 1;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table::before,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 5;
+    transition: opacity 0.3s ease;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table.wx__virtual__has-fixed-left::before {
+    left: var(--wx-virtual-fixed-left-width, 0px);
+    transform: translateX(0);
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0));
+    opacity: 1;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table.wx__virtual__has-fixed-right::after {
+    opacity: 0;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table.ant-table-scroll-position-left::before,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table.ant-table-scroll-position-right::after {
+    opacity: 0;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-thead > tr > th.wx__virtual__fixed-left:focus-within,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-thead > tr > th.wx__virtual__fixed-right:focus-within,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr > td.wx__virtual__fixed-left:focus-within,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr > td.wx__virtual__fixed-right:focus-within {
+    z-index: 6 !important;
+    outline: 2px solid var(--wx-spec-fixed-focus);
+    outline-offset: -2px;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-thead > tr > th.wx__virtual__fixed-left,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-thead > tr > th.wx__virtual__fixed-right {
+    border-bottom-color: var(--wx-spec-fixed-separator) !important;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-thead > tr > th.wx__virtual__fixed-right-first,
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-tbody > tr > td.wx__virtual__fixed-right-first {
+    box-shadow: inset 1px 0 0 var(--wx-spec-fixed-separator);
+}
+
+.wx__common__table__container .wx__common__table__virtual-base .ant-table-body > div > table {
+    border-left: 1px solid #e8e8e8;
+    border-top: 0;
+    border-right: 0;
+    border-bottom: 0;
+}
+
+.wx__common__table__container .wx__common__table__virtual-base th.ant-table-selection-column,
+.wx__common__table__container .wx__common__table__virtual-base td.ant-table-selection-column {
+    min-width: 30px;
+    width: 30px;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
