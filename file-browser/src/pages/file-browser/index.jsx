@@ -12,8 +12,20 @@ const getDownloadPath = (item) => {
   return item.downloadPath || item.path;
 };
 
+const matchesLogType = (selectedLogType, actualLogType) => {
+  if (!selectedLogType || selectedLogType === 'all') {
+    return true;
+  }
+
+  if (!actualLogType) {
+    return false;
+  }
+
+  return actualLogType === selectedLogType || actualLogType.indexOf(`${selectedLogType}_`) === 0;
+};
+
 const FileBrowser = (props) => {
-  const { adapter, doubleClickFileToDownload, onChange, value } = props;
+  const { adapter, doubleClickFileToDownload, logFilterConfig, onChange, value } = props;
   const [searchInput, setSearchInput] = useState(value.q || '');
   const { listData, loading, roots, rootsLoading } = useFileBrowserData({
     adapter,
@@ -31,19 +43,56 @@ const FileBrowser = (props) => {
     setSearchInput(value.q || '');
   }, [value.q]);
 
+  const filteredItems = useMemo(
+    () => {
+      if (!logFilterConfig || !logFilterConfig.classify) {
+        return listData.items;
+      }
+
+      return listData.items.filter((item) => {
+        if (item.isDirectory) {
+          return true;
+        }
+
+        const classification = logFilterConfig.classify(item.name);
+        return matchesLogType(value.logType, classification.logType);
+      }).map((item) => {
+        if (item.isDirectory) {
+          return item;
+        }
+
+        const classification = logFilterConfig.classify(item.name);
+        const typeLabel = logFilterConfig.getTypeLabel
+          ? logFilterConfig.getTypeLabel(classification)
+          : logFilterConfig.labels && logFilterConfig.labels[classification.logType]
+            ? logFilterConfig.labels[classification.logType]
+            : item.typeLabel;
+
+        return {
+          ...item,
+          logType: classification.logType,
+          logTypeGroup: classification.logTypeGroup,
+          typeLabel
+        };
+      });
+    },
+    [listData.items, logFilterConfig, value.logType]
+  );
+
   const selectedItems = useMemo(
     () => {
-      return listData.items.filter((item) => {
+      return filteredItems.filter((item) => {
         return (value.selectedRowKeys || []).indexOf(item.key) > -1;
       });
     },
-    [listData.items, value.selectedRowKeys]
+    [filteredItems, value.selectedRowKeys]
   );
 
   const handleOpen = (record) => {
     if (record.isDirectory) {
       onChange({
         path: record.path,
+        logType: 'all',
         selectedRowKeys: []
       });
       return;
@@ -89,13 +138,20 @@ const FileBrowser = (props) => {
       breadcrumbs={listData.breadcrumbs}
       currentPath={value.path}
       doubleClickFileToDownload={doubleClickFileToDownload}
-      items={listData.items}
+      items={filteredItems}
       loadTree={adapter.fetchTree}
       loading={loading}
       onBatchDownload={handleBatchDownload}
       onDownload={handleDownload}
+      onLogTypeChange={(nextLogType) => {
+        onChange({
+          logType: nextLogType,
+          selectedRowKeys: []
+        });
+      }}
       onNavigate={(path, nextRootId) => {
         onChange({
+          logType: 'all',
           path,
           root: nextRootId || value.root,
           selectedRowKeys: []
@@ -129,7 +185,10 @@ const FileBrowser = (props) => {
       rootId={value.root}
       searchValue={searchInput}
       selectedRowKeys={value.selectedRowKeys || []}
-      total={listData.total}
+      selectedLogType={value.logType || 'all'}
+      showLogFilter={!!logFilterConfig}
+      logTypeOptions={logFilterConfig ? logFilterConfig.options : []}
+      total={filteredItems.length}
     />
   );
 };
@@ -143,8 +202,18 @@ FileBrowser.propTypes = {
     fetchTree: PropTypes.func.isRequired
   }).isRequired,
   doubleClickFileToDownload: PropTypes.bool,
+  logFilterConfig: PropTypes.shape({
+    classify: PropTypes.func.isRequired,
+    getTypeLabel: PropTypes.func,
+    labels: PropTypes.object,
+    options: PropTypes.arrayOf(PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      value: PropTypes.string.isRequired
+    })).isRequired
+  }),
   onChange: PropTypes.func.isRequired,
   value: PropTypes.shape({
+    logType: PropTypes.string,
     path: PropTypes.string,
     q: PropTypes.string,
     root: PropTypes.string,
@@ -155,7 +224,8 @@ FileBrowser.propTypes = {
 };
 
 FileBrowser.defaultProps = {
-  doubleClickFileToDownload: false
+  doubleClickFileToDownload: false,
+  logFilterConfig: null
 };
 
 export default FileBrowser;

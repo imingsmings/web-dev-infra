@@ -73,6 +73,10 @@
   white-space: nowrap;
 }
 
+.file-browser-log-type-filter {
+  min-width: 180px;
+}
+
 .file-browser-path-search {
   flex: 0 0 auto;
   display: flex;
