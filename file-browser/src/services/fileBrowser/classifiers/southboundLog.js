@@ -13,17 +13,17 @@ const SOUTHBOUND_RULES = [
   },
   {
     group: LOG_TYPE_GROUPS.CODE23,
-    pattern: /(?:^|[_-])23(?:[_-])\d+\.lgz$/i,
+    pattern: /(?:^|[_-])\d*23(?:[_-])\d+\.lgz$/i,
     type: SOUTHBOUND_LOG_TYPES.CODE23
   },
   {
     group: LOG_TYPE_GROUPS.CODE69,
-    pattern: /(?:^|[_-])69(?:[_-])\d+\.lgz$/i,
+    pattern: /(?:^|[_-])\d*69(?:[_-])\d+\.lgz$/i,
     type: SOUTHBOUND_LOG_TYPES.CODE69
   },
   {
     group: LOG_TYPE_GROUPS.CODE68,
-    pattern: /(?:^|[_-])68(?:[_-])\d+\.lgz$/i,
+    pattern: /(?:^|[_-])\d*68(?:[_-])\d+\.lgz$/i,
     type: SOUTHBOUND_LOG_TYPES.CODE68
   },
   {
