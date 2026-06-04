@@ -48,22 +48,32 @@ const SOUTHBOUND_RULES = [
   },
   {
     group: LOG_TYPE_GROUPS.OPERATE,
-    pattern: /_operatelog\.lgz$/i,
+    pattern: /operatelog/i,
     type: SOUTHBOUND_LOG_TYPES.OPERATE
   },
   {
     group: LOG_TYPE_GROUPS.ALARM,
-    pattern: /_alarmlog\.lgz$/i,
+    pattern: /alarmlog/i,
     type: SOUTHBOUND_LOG_TYPES.ALARM
   },
   {
     group: LOG_TYPE_GROUPS.EVENT,
-    pattern: /_eventlog\.lgz$/i,
+    pattern: /eventlog/i,
     type: SOUTHBOUND_LOG_TYPES.EVENT
   },
   {
+    group: LOG_TYPE_GROUPS.EXCEPTION,
+    pattern: /exceptionlog/i,
+    type: SOUTHBOUND_LOG_TYPES.EXCEPTION
+  },
+  {
+    group: LOG_TYPE_GROUPS.DEBUG,
+    pattern: /debuglog/i,
+    type: SOUTHBOUND_LOG_TYPES.DEBUG
+  },
+  {
     group: LOG_TYPE_GROUPS.OMKEY,
-    pattern: /_omkeylog\.lgz$/i,
+    pattern: /omkeylog/i,
     type: SOUTHBOUND_LOG_TYPES.OMKEY
   }
 ];

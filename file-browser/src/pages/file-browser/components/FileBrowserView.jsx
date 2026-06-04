@@ -31,8 +31,7 @@ const FileBrowserView = (props) => {
     searchValue,
     selectedLogType,
     selectedRowKeys,
-    showLogFilter,
-    total
+    showLogFilter
   } = props;
 
   return (
@@ -98,9 +97,6 @@ const FileBrowserView = (props) => {
                 selectedRowKeys={selectedRowKeys}
               />
             </Spin>
-            <div className="file-browser-table-footer">
-              <span>{total} items</span>
-            </div>
           </main>
         </section>
       </div>
@@ -139,8 +135,7 @@ FileBrowserView.propTypes = {
   searchValue: PropTypes.string.isRequired,
   selectedLogType: PropTypes.string,
   selectedRowKeys: PropTypes.arrayOf(PropTypes.string).isRequired,
-  showLogFilter: PropTypes.bool,
-  total: PropTypes.number.isRequired
+  showLogFilter: PropTypes.bool
 };
 
 FileBrowserView.defaultProps = {

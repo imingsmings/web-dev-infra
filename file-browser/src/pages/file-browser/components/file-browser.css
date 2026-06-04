@@ -105,13 +105,11 @@
   gap: 8px;
 }
 
-.file-browser-table-footer {
+.file-browser-pagination {
   display: flex;
-  justify-content: flex-start;
+  justify-content: flex-end;
   align-items: center;
   margin-top: 12px;
-  font-size: 14px;
-  color: #7d8794;
 }
 
 @media (max-width: 1200px) {

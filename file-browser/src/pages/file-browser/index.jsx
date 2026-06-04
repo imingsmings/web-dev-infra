@@ -188,7 +188,6 @@ const FileBrowser = (props) => {
       selectedLogType={value.logType || 'all'}
       showLogFilter={!!logFilterConfig}
       logTypeOptions={logFilterConfig ? logFilterConfig.options : []}
-      total={filteredItems.length}
     />
   );
 };
