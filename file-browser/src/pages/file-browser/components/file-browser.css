@@ -77,6 +77,10 @@
   min-width: 180px;
 }
 
+.file-browser-time-filter {
+  min-width: 120px;
+}
+
 .file-browser-path-search {
   flex: 0 0 auto;
   display: flex;

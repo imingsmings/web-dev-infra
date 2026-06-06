@@ -24,6 +24,21 @@ const matchesLogType = (selectedLogType, actualLogType) => {
   return actualLogType === selectedLogType || actualLogType.indexOf(`${selectedLogType}_`) === 0;
 };
 
+const matchesTimeRange = (selectedTimeRange, updatedAt) => {
+  if (!selectedTimeRange || selectedTimeRange === 'all') {
+    return true;
+  }
+
+  const hours = Number(selectedTimeRange);
+  const updatedTime = new Date(updatedAt).getTime();
+
+  if (!Number.isFinite(hours) || Number.isNaN(updatedTime)) {
+    return false;
+  }
+
+  return Date.now() - updatedTime <= hours * 60 * 60 * 1000;
+};
+
 const FileBrowser = (props) => {
   const { adapter, doubleClickFileToDownload, logFilterConfig, onChange, value } = props;
   const [searchInput, setSearchInput] = useState(value.q || '');
@@ -33,6 +48,7 @@ const FileBrowser = (props) => {
       onChange({
         root: '',
         path: '/',
+        timeRange: 'all',
         selectedRowKeys: []
       });
     },
@@ -45,19 +61,21 @@ const FileBrowser = (props) => {
 
   const filteredItems = useMemo(
     () => {
-      if (!logFilterConfig || !logFilterConfig.classify) {
-        return listData.items;
-      }
-
       return listData.items.filter((item) => {
         if (item.isDirectory) {
           return true;
         }
 
-        const classification = logFilterConfig.classify(item.name);
-        return matchesLogType(value.logType, classification.logType);
+        const classification = logFilterConfig && logFilterConfig.classify
+          ? logFilterConfig.classify(item.name)
+          : null;
+        const matchesCurrentLogType = classification
+          ? matchesLogType(value.logType, classification.logType)
+          : true;
+
+        return matchesCurrentLogType && matchesTimeRange(value.timeRange, item.updatedAt);
       }).map((item) => {
-        if (item.isDirectory) {
+        if (item.isDirectory || !logFilterConfig || !logFilterConfig.classify) {
           return item;
         }
 
@@ -76,7 +94,7 @@ const FileBrowser = (props) => {
         };
       });
     },
-    [listData.items, logFilterConfig, value.logType]
+    [listData.items, logFilterConfig, value.logType, value.timeRange]
   );
 
   const selectedItems = useMemo(
@@ -93,6 +111,7 @@ const FileBrowser = (props) => {
       onChange({
         path: record.path,
         logType: 'all',
+        timeRange: 'all',
         selectedRowKeys: []
       });
       return;
@@ -149,11 +168,18 @@ const FileBrowser = (props) => {
           selectedRowKeys: []
         });
       }}
+      onTimeRangeChange={(nextTimeRange) => {
+        onChange({
+          timeRange: nextTimeRange,
+          selectedRowKeys: []
+        });
+      }}
       onNavigate={(path, nextRootId) => {
         onChange({
           logType: 'all',
           path,
           root: nextRootId || value.root,
+          timeRange: 'all',
           selectedRowKeys: []
         });
       }}
@@ -165,6 +191,7 @@ const FileBrowser = (props) => {
         if (nextValue === '') {
           onChange({
             q: '',
+            timeRange: 'all',
             selectedRowKeys: []
           });
         }
@@ -172,6 +199,7 @@ const FileBrowser = (props) => {
       onSearchSubmit={() => {
         onChange({
           q: searchInput,
+          timeRange: 'all',
           selectedRowKeys: []
         });
       }}
@@ -186,6 +214,7 @@ const FileBrowser = (props) => {
       searchValue={searchInput}
       selectedRowKeys={value.selectedRowKeys || []}
       selectedLogType={value.logType || 'all'}
+      selectedTimeRange={value.timeRange || 'all'}
       showLogFilter={!!logFilterConfig}
       logTypeOptions={logFilterConfig ? logFilterConfig.options : []}
     />
@@ -218,6 +247,7 @@ FileBrowser.propTypes = {
     root: PropTypes.string,
     selectedRowKeys: PropTypes.arrayOf(PropTypes.string),
     sort: PropTypes.string,
+    timeRange: PropTypes.string,
     type: PropTypes.string
   }).isRequired
 };

@@ -7,6 +7,29 @@ import FileTable from './FileTable';
 import PathBreadcrumb from './PathBreadcrumb';
 import './file-browser.css';
 
+const TIME_RANGE_OPTIONS = [
+  {
+    label: '全部时间',
+    value: 'all'
+  },
+  {
+    label: '1小时内',
+    value: '1'
+  },
+  {
+    label: '2小时内',
+    value: '2'
+  },
+  {
+    label: '6小时内',
+    value: '6'
+  },
+  {
+    label: '24小时内',
+    value: '24'
+  }
+];
+
 const FileBrowserView = (props) => {
   const {
     batchDownloadDisabled,
@@ -25,12 +48,14 @@ const FileBrowserView = (props) => {
     onSearchChange,
     onSearchSubmit,
     onSelectionChange,
+    onTimeRangeChange,
     roots,
     rootsLoading,
     rootId,
     searchValue,
     selectedLogType,
     selectedRowKeys,
+    selectedTimeRange,
     showLogFilter
   } = props;
 
@@ -79,6 +104,21 @@ const FileBrowserView = (props) => {
                     })}
                   </Select>
                 ) : null}
+                {/*
+                <Select
+                  className="file-browser-time-filter"
+                  onChange={onTimeRangeChange}
+                  value={selectedTimeRange}
+                >
+                  {TIME_RANGE_OPTIONS.map((option) => {
+                    return (
+                      <Select.Option key={option.value} value={option.value}>
+                        {option.label}
+                      </Select.Option>
+                    );
+                  })}
+                </Select>
+                */}
                 <FileBrowserSearch
                   onChange={onSearchChange}
                   onSearch={onSearchSubmit}
@@ -129,12 +169,14 @@ FileBrowserView.propTypes = {
   onSearchChange: PropTypes.func.isRequired,
   onSearchSubmit: PropTypes.func.isRequired,
   onSelectionChange: PropTypes.func.isRequired,
+  onTimeRangeChange: PropTypes.func.isRequired,
   roots: PropTypes.arrayOf(PropTypes.object).isRequired,
   rootsLoading: PropTypes.bool,
   rootId: PropTypes.string,
   searchValue: PropTypes.string.isRequired,
   selectedLogType: PropTypes.string,
   selectedRowKeys: PropTypes.arrayOf(PropTypes.string).isRequired,
+  selectedTimeRange: PropTypes.string,
   showLogFilter: PropTypes.bool
 };
 
@@ -145,6 +187,7 @@ FileBrowserView.defaultProps = {
   rootsLoading: false,
   rootId: '',
   selectedLogType: 'all',
+  selectedTimeRange: 'all',
   showLogFilter: false
 };
 

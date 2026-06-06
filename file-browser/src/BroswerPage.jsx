@@ -19,6 +19,7 @@ const DEFAULT_BROWSER_STATE = {
   root: '',
   path: '/',
   q: '',
+  timeRange: 'all',
   type: 'all',
   sort: 'name.asc',
   selectedRowKeys: []
