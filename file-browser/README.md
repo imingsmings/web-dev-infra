@@ -20,9 +20,9 @@ Open `http://localhost:3000/files`.
 ## Structure
 
 ```txt
-src/pages/file-browser
-src/services/fileBrowser
+src/components/taskfile
+src/components/taskfile/file-browser
+src/components/taskfile/file-browser/services
 ```
 
-`src/services/fileBrowser/api.js` keeps API endpoint declarations.
-`src/services/fileBrowser/schema.js` keeps response shape declarations.
+`src/components/taskfile/file-browser/services/api.js` keeps API endpoint declarations.

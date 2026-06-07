@@ -8,7 +8,7 @@ module.exports = function createWebpackConfig(env, argv) {
 
   return {
     mode,
-    entry: path.resolve(__dirname, 'src/index.js'),
+    entry: path.resolve(__dirname, 'src/main.js'),
     output: {
       path: path.resolve(__dirname, 'build'),
       filename: isProduction ? 'static/js/[name].[contenthash:8].js' : 'static/js/[name].js',

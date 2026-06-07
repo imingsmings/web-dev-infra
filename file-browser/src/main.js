@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import { HashRouter, Redirect, Route, Switch } from 'react-router-dom'
 import 'antd/dist/antd.css'
 import './styles/global.css'
-import BroswerPage from './BroswerPage'
+import BroswerPage from './components/taskfile'
 
 function AppRouter() {
   return (

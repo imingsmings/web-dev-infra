@@ -1,16 +1,16 @@
 import React, { useMemo, useState } from 'react';
 import { Tabs } from 'antd';
-import FileBrowser from './pages/file-browser';
-import classifyNorthboundLog from './services/fileBrowser/classifiers/northboundLog';
-import classifySouthboundLog from './services/fileBrowser/classifiers/southboundLog';
+import FileBrowser from './file-browser';
+import classifyNorthboundLog from './file-browser/services/classifiers/northboundLog';
+import classifySouthboundLog from './file-browser/services/classifiers/southboundLog';
 import {
   LOG_TYPE_GROUP_LABELS,
   NORTHBOUND_LOG_TYPE_LABELS,
   NORTHBOUND_LOG_TYPE_OPTIONS,
   SOUTHBOUND_LOG_TYPE_LABELS,
   SOUTHBOUND_LOG_TYPE_OPTIONS
-} from './services/fileBrowser/logTypes';
-import { ftpAdapter, s3Adapter } from './services/fileBrowser/service';
+} from './file-browser/services/logTypes';
+import { ftpAdapter, s3Adapter } from './file-browser/services/service';
 
 const { TabPane } = Tabs;
 
