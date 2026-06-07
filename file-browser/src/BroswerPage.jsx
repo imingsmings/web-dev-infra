@@ -19,6 +19,7 @@ const DEFAULT_BROWSER_STATE = {
   root: '',
   path: '/',
   q: '',
+  refreshKey: 0,
   timeRange: 'all',
   type: 'all',
   sort: 'name.asc',
@@ -85,10 +86,25 @@ const BroswerPage = () => {
     });
   };
 
+  const handleTabChange = (nextActiveTab) => {
+    setActiveTab(nextActiveTab);
+    setTabStates((prevTabStates) => {
+      const nextTabState = prevTabStates[nextActiveTab] || DEFAULT_BROWSER_STATE;
+
+      return {
+        ...prevTabStates,
+        [nextActiveTab]: {
+          ...nextTabState,
+          refreshKey: (nextTabState.refreshKey || 0) + 1
+        }
+      };
+    });
+  };
+
   return (
     <Tabs
       activeKey={activeTab}
-      onChange={setActiveTab}
+      onChange={handleTabChange}
     >
       <TabPane key={TAB_KEYS.ne} tab="网元日志">
         <FileBrowser

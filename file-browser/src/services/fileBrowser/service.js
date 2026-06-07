@@ -187,6 +187,7 @@ function mapEntry(item) {
     name: fileName,
     path: relativePath,
     isDirectory: Boolean(item.directory || item.isDirectory),
+    hasChildren: item.hasChildren,
     size: item.size,
     ext,
     mimeType: item.mimeType,
@@ -269,13 +270,14 @@ export function createStorageAdapter(protocol) {
     })
     const now = Date.now()
     const cached = listRequestCache.get(cacheKey)
+    const forceRefresh = Boolean(params.forceRefresh)
 
     if (cached) {
-      if (cached.promise) {
+      if (cached.promise && !forceRefresh) {
         return cached.promise
       }
 
-      if (now - cached.timestamp < LIST_CACHE_TTL) {
+      if (!forceRefresh && now - cached.timestamp < LIST_CACHE_TTL) {
         return Promise.resolve(cached.payload)
       }
     }
@@ -332,6 +334,7 @@ export function createStorageAdapter(protocol) {
       return fetchStorageObjects({
         rootId: params.rootId,
         path: params.path,
+        forceRefresh: params.forceRefresh,
         q: ''
       }).then(function mapTreeItems(payload) {
         const objects = payload && payload.data && Array.isArray(payload.data.objects) ? payload.data.objects : []
@@ -361,6 +364,7 @@ export function createStorageAdapter(protocol) {
       return fetchStorageObjects({
         rootId: params.rootId,
         path: normalizedPath,
+        forceRefresh: params.forceRefresh,
         q: params.q
       }).then(function mapListResponse(payload) {
         const objects = payload && payload.data && Array.isArray(payload.data.objects) ? payload.data.objects : []

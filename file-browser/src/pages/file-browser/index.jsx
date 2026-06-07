@@ -97,10 +97,34 @@ const FileBrowser = (props) => {
     [listData.items, logFilterConfig, value.logType, value.timeRange]
   );
 
+  const currentDirectoryItems = useMemo(
+    () => {
+      if (
+        listData.rootId !== value.root
+        || listData.path !== value.path
+        || listData.refreshKey !== (value.refreshKey || 0)
+      ) {
+        return null;
+      }
+
+      return listData.items;
+    },
+    [listData.items, listData.path, listData.refreshKey, listData.rootId, value.path, value.refreshKey, value.root]
+  );
+
+  const canDownloadInCurrentDir = useMemo(
+    () => {
+      return listData.items.length > 0 && listData.items.every((item) => {
+        return !item.isDirectory;
+      });
+    },
+    [listData.items]
+  );
+
   const selectedItems = useMemo(
     () => {
       return filteredItems.filter((item) => {
-        return (value.selectedRowKeys || []).indexOf(item.key) > -1;
+        return !item.isDirectory && (value.selectedRowKeys || []).indexOf(item.key) > -1;
       });
     },
     [filteredItems, value.selectedRowKeys]
@@ -121,15 +145,15 @@ const FileBrowser = (props) => {
   };
 
   const handleDownload = (record) => {
-    const request = record.isDirectory
-      ? adapter.downloadBatch({
-        rootId: value.root,
-        paths: [getDownloadPath(record)]
-      })
-      : adapter.downloadFile({
-        rootId: value.root,
-        path: record.path
-      });
+    if (!canDownloadInCurrentDir || record.isDirectory) {
+      message.warning('Only files in the last-level directory can be downloaded.');
+      return;
+    }
+
+    const request = adapter.downloadFile({
+      rootId: value.root,
+      path: record.path
+    });
 
     request.then(() => {
       message.success(`Download queued for ${record.name}`);
@@ -139,6 +163,11 @@ const FileBrowser = (props) => {
   };
 
   const handleBatchDownload = () => {
+    if (!canDownloadInCurrentDir || !selectedItems.length) {
+      message.warning('Only files in the last-level directory can be downloaded.');
+      return;
+    }
+
     adapter.downloadBatch({
       rootId: value.root,
       paths: selectedItems.map((item) => {
@@ -151,12 +180,21 @@ const FileBrowser = (props) => {
     });
   };
 
+  const handleRefresh = () => {
+    onChange({
+      refreshKey: (value.refreshKey || 0) + 1,
+      selectedRowKeys: []
+    });
+  };
+
   return (
     <FileBrowserView
-      batchDownloadDisabled={!selectedItems.length}
+      batchDownloadDisabled={!canDownloadInCurrentDir || !selectedItems.length}
       breadcrumbs={listData.breadcrumbs}
+      currentDirectoryItems={currentDirectoryItems}
       currentPath={value.path}
       doubleClickFileToDownload={doubleClickFileToDownload}
+      downloadEnabled={canDownloadInCurrentDir}
       items={filteredItems}
       loadTree={adapter.fetchTree}
       loading={loading}
@@ -184,6 +222,7 @@ const FileBrowser = (props) => {
         });
       }}
       onOpen={handleOpen}
+      onRefresh={handleRefresh}
       onSearchChange={(event) => {
         const nextValue = event.target.value;
         setSearchInput(nextValue);
@@ -208,6 +247,7 @@ const FileBrowser = (props) => {
           selectedRowKeys: nextKeys
         });
       }}
+      refreshKey={value.refreshKey || 0}
       roots={roots}
       rootsLoading={rootsLoading}
       rootId={value.root}
@@ -244,6 +284,7 @@ FileBrowser.propTypes = {
     logType: PropTypes.string,
     path: PropTypes.string,
     q: PropTypes.string,
+    refreshKey: PropTypes.number,
     root: PropTypes.string,
     selectedRowKeys: PropTypes.arrayOf(PropTypes.string),
     sort: PropTypes.string,

@@ -39,7 +39,16 @@ const renderNameCell = (text, record) => {
 };
 
 const FileTable = (props) => {
-  const { doubleClickFileToDownload, items, loading, onDownload, onOpen, onSelectionChange, selectedRowKeys } = props;
+  const {
+    doubleClickFileToDownload,
+    downloadEnabled,
+    items,
+    loading,
+    onDownload,
+    onOpen,
+    onSelectionChange,
+    selectedRowKeys
+  } = props;
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: DEFAULT_PAGE_SIZE
@@ -104,6 +113,10 @@ const FileTable = (props) => {
       key: 'actions',
       width: 160,
       render: (_, record) => {
+        if (!downloadEnabled || record.isDirectory) {
+          return '—';
+        }
+
         return (
           <div className="file-browser-table-actions">
             <Button
@@ -137,6 +150,11 @@ const FileTable = (props) => {
         pagination={false}
         rowKey="key"
         rowSelection={{
+          getCheckboxProps: (record) => {
+            return {
+              disabled: !downloadEnabled || record.isDirectory
+            };
+          },
           onChange: onSelectionChange,
           selectedRowKeys
         }}
@@ -160,6 +178,7 @@ const FileTable = (props) => {
 
 FileTable.propTypes = {
   doubleClickFileToDownload: PropTypes.bool,
+  downloadEnabled: PropTypes.bool,
   items: PropTypes.arrayOf(
     PropTypes.shape({
       isDirectory: PropTypes.bool.isRequired,
@@ -179,7 +198,8 @@ FileTable.propTypes = {
 };
 
 FileTable.defaultProps = {
-  doubleClickFileToDownload: false
+  doubleClickFileToDownload: false,
+  downloadEnabled: false
 };
 
 export default FileTable;

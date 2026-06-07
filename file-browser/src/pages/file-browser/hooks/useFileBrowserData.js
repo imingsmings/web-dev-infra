@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { message } from 'antd';
 
 const useFileBrowserData = (options) => {
@@ -8,9 +8,11 @@ const useFileBrowserData = (options) => {
   const [listData, setListData] = useState({
     breadcrumbs: [],
     items: [],
+    refreshKey: value.refreshKey || 0,
     total: 0
   });
   const [loading, setLoading] = useState(false);
+  const lastRefreshKeyRef = useRef(value.refreshKey || 0);
 
   useEffect(
     () => {
@@ -21,6 +23,7 @@ const useFileBrowserData = (options) => {
       setListData({
         breadcrumbs: [],
         items: [],
+        refreshKey: value.refreshKey || 0,
         total: 0
       });
       setLoading(false);
@@ -67,10 +70,15 @@ const useFileBrowserData = (options) => {
 
   useEffect(
     () => {
+      const refreshKey = value.refreshKey || 0;
+      const forceRefresh = refreshKey !== lastRefreshKeyRef.current;
+      lastRefreshKeyRef.current = refreshKey;
+
       if (!value.root) {
         setListData({
           breadcrumbs: [],
           items: [],
+          refreshKey,
           total: 0
         });
         setLoading(false);
@@ -84,6 +92,7 @@ const useFileBrowserData = (options) => {
         rootId: value.root,
         path: value.path,
         q: value.q,
+        forceRefresh,
         sort: value.sort,
         type: value.type
       }).then((data) => {
@@ -91,7 +100,10 @@ const useFileBrowserData = (options) => {
           return;
         }
 
-        setListData(data);
+        setListData({
+          ...data,
+          refreshKey
+        });
         setLoading(false);
       }).catch(() => {
         if (!active) {
@@ -106,7 +118,7 @@ const useFileBrowserData = (options) => {
         active = false;
       };
     },
-    [adapter, value.path, value.q, value.root, value.sort, value.type]
+    [adapter, value.path, value.q, value.refreshKey, value.root, value.sort, value.type]
   );
 
   return {

@@ -91,6 +91,12 @@
   width: 320px;
 }
 
+.file-browser-refresh-button {
+  flex: 0 0 auto;
+  width: 40px;
+  padding: 0;
+}
+
 .file-browser-breadcrumb {
   margin-bottom: 0;
   color: #98a2ae;

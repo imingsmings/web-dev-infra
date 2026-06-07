@@ -34,8 +34,10 @@ const FileBrowserView = (props) => {
   const {
     batchDownloadDisabled,
     breadcrumbs,
+    currentDirectoryItems,
     currentPath,
     doubleClickFileToDownload,
+    downloadEnabled,
     items,
     loadTree,
     loading,
@@ -45,10 +47,12 @@ const FileBrowserView = (props) => {
     onLogTypeChange,
     onNavigate,
     onOpen,
+    onRefresh,
     onSearchChange,
     onSearchSubmit,
     onSelectionChange,
     onTimeRangeChange,
+    refreshKey,
     roots,
     rootsLoading,
     rootId,
@@ -64,10 +68,12 @@ const FileBrowserView = (props) => {
       <div className="file-browser-shell">
         <aside className="file-browser-sidebar">
           <DirectoryTreePanel
+            currentDirectoryItems={currentDirectoryItems}
             currentPath={currentPath}
             loadTree={loadTree}
             loading={rootsLoading}
             onSelectPath={onNavigate}
+            refreshKey={refreshKey}
             roots={roots}
             rootId={rootId}
           />
@@ -124,11 +130,20 @@ const FileBrowserView = (props) => {
                   onSearch={onSearchSubmit}
                   value={searchValue}
                 />
+                <Button
+                  className="file-browser-refresh-button"
+                  disabled={!rootId || loading}
+                  onClick={onRefresh}
+                  title="刷新"
+                >
+                  <Icon type="reload" />
+                </Button>
               </div>
             </div>
             <Spin spinning={loading}>
               <FileTable
                 doubleClickFileToDownload={doubleClickFileToDownload}
+                downloadEnabled={downloadEnabled}
                 items={items}
                 loading={loading}
                 onDownload={onDownload}
@@ -152,8 +167,10 @@ FileBrowserView.propTypes = {
       path: PropTypes.string.isRequired
     })
   ).isRequired,
+  currentDirectoryItems: PropTypes.arrayOf(PropTypes.object),
   currentPath: PropTypes.string.isRequired,
   doubleClickFileToDownload: PropTypes.bool,
+  downloadEnabled: PropTypes.bool,
   items: PropTypes.arrayOf(PropTypes.object).isRequired,
   loadTree: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
@@ -166,10 +183,12 @@ FileBrowserView.propTypes = {
   onLogTypeChange: PropTypes.func,
   onNavigate: PropTypes.func.isRequired,
   onOpen: PropTypes.func.isRequired,
+  onRefresh: PropTypes.func.isRequired,
   onSearchChange: PropTypes.func.isRequired,
   onSearchSubmit: PropTypes.func.isRequired,
   onSelectionChange: PropTypes.func.isRequired,
   onTimeRangeChange: PropTypes.func.isRequired,
+  refreshKey: PropTypes.number,
   roots: PropTypes.arrayOf(PropTypes.object).isRequired,
   rootsLoading: PropTypes.bool,
   rootId: PropTypes.string,
@@ -181,9 +200,12 @@ FileBrowserView.propTypes = {
 };
 
 FileBrowserView.defaultProps = {
+  currentDirectoryItems: null,
   doubleClickFileToDownload: false,
+  downloadEnabled: false,
   logTypeOptions: [],
   onLogTypeChange: null,
+  refreshKey: 0,
   rootsLoading: false,
   rootId: '',
   selectedLogType: 'all',

@@ -6,6 +6,7 @@ import './file-browser.css';
 
 const TreeNode = Tree.TreeNode;
 const ROOT_PATH = '/';
+const TREE_REFRESH_FALLBACK_DELAY = 800;
 
 const buildNodeKey = (rootId, nodePath) => {
   return `${rootId}:${nodePath}`;
@@ -16,6 +17,18 @@ const createRootNode = (rootId) => {
     key: buildNodeKey(rootId, ROOT_PATH),
     title: rootId,
     path: ROOT_PATH,
+    rootId,
+    isLeaf: false,
+    loaded: false,
+    children: []
+  };
+};
+
+const createPathNode = (rootId, nodePath, title) => {
+  return {
+    key: buildNodeKey(rootId, nodePath),
+    title,
+    path: nodePath,
     rootId,
     isLeaf: false,
     loaded: false,
@@ -57,6 +70,119 @@ const injectChildren = (nodes, targetKey, children) => {
   });
 };
 
+const toDirectoryTreeNodes = (rootId, items, existingChildren) => {
+  const existingChildrenByKey = new Map(
+    (existingChildren || []).map((child) => {
+      return [child.key, child];
+    })
+  );
+
+  return items.filter((item) => {
+    return item.isDirectory;
+  }).map((item) => {
+    const normalizedPath = normalizePath(item.path);
+    const key = buildNodeKey(rootId, normalizedPath);
+    const existingNode = existingChildrenByKey.get(key);
+
+    return {
+      ...(existingNode || {}),
+      key,
+      title: item.name,
+      path: normalizedPath,
+      rootId,
+      isLeaf: item.hasChildren === false,
+      loaded: existingNode ? existingNode.loaded : false,
+      children: existingNode && existingNode.children ? existingNode.children : []
+    };
+  });
+};
+
+const syncNodeChildrenFromItems = (nodes, rootId, nodePath, items) => {
+  const targetKey = buildNodeKey(rootId, normalizePath(nodePath));
+
+  return nodes.map((node) => {
+    if (node.key === targetKey) {
+      const children = toDirectoryTreeNodes(rootId, items, node.children);
+
+      return {
+        ...node,
+        children,
+        isLeaf: children.length === 0,
+        loaded: true
+      };
+    }
+
+    if (node.children && node.children.length) {
+      return {
+        ...node,
+        children: syncNodeChildrenFromItems(node.children, rootId, nodePath, items)
+      };
+    }
+
+    return node;
+  });
+};
+
+const ensureDescendantPath = (children, rootId, segments, parentPath) => {
+  if (!segments.length) {
+    return children || [];
+  }
+
+  const nextSegment = segments[0];
+  const nextPath = parentPath === ROOT_PATH ? `/${nextSegment}` : `${parentPath}/${nextSegment}`;
+  const nextKey = buildNodeKey(rootId, nextPath);
+  let foundNode = false;
+  const nextChildren = (children || []).map((child) => {
+    if (child.key !== nextKey) {
+      return child;
+    }
+
+    foundNode = true;
+    return {
+      ...child,
+      isLeaf: false,
+      children: ensureDescendantPath(child.children || [], rootId, segments.slice(1), nextPath)
+    };
+  });
+
+  if (!foundNode) {
+    nextChildren.push({
+      ...createPathNode(rootId, nextPath, nextSegment),
+      children: ensureDescendantPath([], rootId, segments.slice(1), nextPath)
+    });
+  }
+
+  return nextChildren;
+};
+
+const ensurePathNode = (nodes, rootId, nodePath) => {
+  const normalizedPath = normalizePath(nodePath);
+  const segments = normalizedPath.split('/').filter(Boolean);
+  const rootKey = buildNodeKey(rootId, ROOT_PATH);
+  let foundRoot = false;
+  const nextNodes = nodes.map((node) => {
+    if (node.key !== rootKey) {
+      return node;
+    }
+
+    foundRoot = true;
+    return {
+      ...node,
+      isLeaf: false,
+      children: ensureDescendantPath(node.children || [], rootId, segments, ROOT_PATH)
+    };
+  });
+
+  if (!foundRoot) {
+    nextNodes.push({
+      ...createRootNode(rootId),
+      children: ensureDescendantPath([], rootId, segments, ROOT_PATH)
+    });
+  }
+
+  return nextNodes;
+};
+
 const findNode = (nodes, targetKey) => {
   for (let i = 0; i < nodes.length; i += 1) {
     const node = nodes[i];
@@ -77,8 +203,26 @@ const findNode = (nodes, targetKey) => {
   return null;
 };
 
+const mergeExpandedKeys = (prevExpandedKeys, nextExpandedKeys) => {
+  const mergedExpandedKeys = prevExpandedKeys.slice();
+
+  nextExpandedKeys.forEach((key) => {
+    if (mergedExpandedKeys.indexOf(key) === -1) {
+      mergedExpandedKeys.push(key);
+    }
+  });
+
+  return mergedExpandedKeys;
+};
+
+const waitForFallbackRefresh = () => {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, TREE_REFRESH_FALLBACK_DELAY);
+  });
+};
+
 const DirectoryTreePanel = (props) => {
-  const { currentPath, loading, onSelectPath, rootId, roots, loadTree } = props;
+  const { currentDirectoryItems, currentPath, loading, onSelectPath, refreshKey, rootId, roots, loadTree } = props;
   const [treeData, setTreeData] = useState(() => {
     return roots.map((root) => {
       return createRootNode(root.id);
@@ -89,6 +233,7 @@ const DirectoryTreePanel = (props) => {
   const [syncedExpandedKeys, setSyncedExpandedKeys] = useState([]);
   const [treeLoading, setTreeLoading] = useState(false);
   const treeDataRef = useRef(treeData);
+  const treeRefreshKeyRef = useRef(null);
 
   useEffect(() => {
     treeDataRef.current = treeData;
@@ -126,30 +271,89 @@ const DirectoryTreePanel = (props) => {
       let active = true;
 
       const ensureAncestorsLoaded = async () => {
-        if (!rootId || normalizePath(currentPath) === ROOT_PATH) {
+        if (!rootId || !roots.length) {
+          setTreeLoading(false);
+          return;
+        }
+
+        const normalizedCurrentPath = normalizePath(currentPath);
+        const normalizedRefreshKey = refreshKey || 0;
+        const shouldRefreshCurrentTree = normalizedRefreshKey > 0
+          && normalizedRefreshKey !== treeRefreshKeyRef.current
+          && !Array.isArray(currentDirectoryItems);
+        let workingTreeData = treeDataRef.current;
+
+        if (normalizedCurrentPath === ROOT_PATH) {
+          const currentKey = buildNodeKey(rootId, normalizedCurrentPath);
+          if (Array.isArray(currentDirectoryItems) || shouldRefreshCurrentTree) {
+            let nextTreeData = ensurePathNode(workingTreeData, rootId, normalizedCurrentPath);
+
+            if (Array.isArray(currentDirectoryItems)) {
+              nextTreeData = syncNodeChildrenFromItems(
+                nextTreeData,
+                rootId,
+                normalizedCurrentPath,
+                currentDirectoryItems
+              );
+            } else {
+              await waitForFallbackRefresh();
+              if (!active) {
+                return;
+              }
+
+              const children = await loadTree({
+                rootId,
+                path: normalizedCurrentPath,
+                forceRefresh: true
+              });
+
+              nextTreeData = injectChildren(
+                nextTreeData,
+                currentKey,
+                decorateChildNodes(rootId, children)
+              );
+            }
+
+            if (active) {
+              if (shouldRefreshCurrentTree) {
+                treeRefreshKeyRef.current = normalizedRefreshKey;
+              }
+              setSyncedExpandedKeys((prevSyncedExpandedKeys) => {
+                return mergeExpandedKeys(prevSyncedExpandedKeys, [currentKey]);
+              });
+              setCollapsedSyncedKeys((prevCollapsedSyncedKeys) => {
+                return prevCollapsedSyncedKeys.filter((key) => {
+                  return key !== currentKey;
+                });
+              });
+              treeDataRef.current = nextTreeData;
+              setTreeData(nextTreeData);
+            }
+          }
+
           setTreeLoading(false);
           return;
         }
 
         setTreeLoading(true);
-        const pathsToLoad = getAncestorPaths(currentPath).slice(0, -1);
-        const nextSyncedKeys = pathsToLoad.map((path) => {
+        const pathsToLoad = getAncestorPaths(normalizedCurrentPath).slice(0, -1);
+        const nextSyncedPaths = pathsToLoad.concat(normalizedCurrentPath);
+        const nextSyncedKeys = nextSyncedPaths.map((path) => {
           return buildNodeKey(rootId, path);
         });
+        let refreshedCurrentTree = false;
 
         setSyncedExpandedKeys((prevSyncedExpandedKeys) => {
-          const mergedSyncedKeys = prevSyncedExpandedKeys.slice();
-
-          nextSyncedKeys.forEach((key) => {
-            if (mergedSyncedKeys.indexOf(key) === -1) {
-              mergedSyncedKeys.push(key);
-            }
-          });
-
-          return mergedSyncedKeys;
+          return mergeExpandedKeys(prevSyncedExpandedKeys, nextSyncedKeys);
         });
 
-        let workingTreeData = treeDataRef.current;
+        if (Array.isArray(currentDirectoryItems) || shouldRefreshCurrentTree) {
+          setCollapsedSyncedKeys((prevCollapsedSyncedKeys) => {
+            return prevCollapsedSyncedKeys.filter((key) => {
+              return nextSyncedKeys.indexOf(key) === -1;
+            });
+          });
+        }
 
         for (let i = 0; i < pathsToLoad.length; i += 1) {
           const ancestorPath = pathsToLoad[i];
@@ -171,7 +375,39 @@ const DirectoryTreePanel = (props) => {
           );
         }
 
+        if (Array.isArray(currentDirectoryItems)) {
+          workingTreeData = ensurePathNode(workingTreeData, rootId, normalizedCurrentPath);
+          workingTreeData = syncNodeChildrenFromItems(
+            workingTreeData,
+            rootId,
+            normalizedCurrentPath,
+            currentDirectoryItems
+          );
+        } else if (shouldRefreshCurrentTree) {
+          await waitForFallbackRefresh();
+          if (!active) {
+            return;
+          }
+
+          workingTreeData = ensurePathNode(workingTreeData, rootId, normalizedCurrentPath);
+          const children = await loadTree({
+            rootId,
+            path: normalizedCurrentPath,
+            forceRefresh: true
+          });
+
+          workingTreeData = injectChildren(
+            workingTreeData,
+            buildNodeKey(rootId, normalizedCurrentPath),
+            decorateChildNodes(rootId, children)
+          );
+          refreshedCurrentTree = true;
+        }
+
         if (active) {
+          if (refreshedCurrentTree) {
+            treeRefreshKeyRef.current = normalizedRefreshKey;
+          }
           treeDataRef.current = workingTreeData;
           setTreeData(workingTreeData);
           setTreeLoading(false);
@@ -191,7 +427,7 @@ const DirectoryTreePanel = (props) => {
         active = false;
       };
     },
-    [currentPath, loadTree, rootId]
+    [currentDirectoryItems, currentPath, loadTree, refreshKey, rootId, roots]
   );
 
   const handleLoadData = (treeNode) => {
@@ -298,10 +534,12 @@ const DirectoryTreePanel = (props) => {
 };
 
 DirectoryTreePanel.propTypes = {
+  currentDirectoryItems: PropTypes.arrayOf(PropTypes.object),
   currentPath: PropTypes.string.isRequired,
   loadTree: PropTypes.func.isRequired,
   loading: PropTypes.bool,
   onSelectPath: PropTypes.func.isRequired,
+  refreshKey: PropTypes.number,
   roots: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired
@@ -311,7 +549,9 @@ DirectoryTreePanel.propTypes = {
 };
 
 DirectoryTreePanel.defaultProps = {
+  currentDirectoryItems: null,
   loading: false,
+  refreshKey: 0,
   rootId: ''
 };
 
